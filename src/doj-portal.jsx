@@ -405,35 +405,65 @@ const ROLES = {
   CITIZEN:            { label:"Citizen",                 level:1,  color:"gray",   stars:0,  icon:"👤" },
 };
 
+const DOJ_ROLES = [
+  "ADMIN","DOJ_CHIEF","DEPUTY_CHIEF",
+  "GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE",
+  "BAR_HEAD","BAR_SUPERVISOR","BAR_MEMBER",
+  "HEAD_LAWYER","SENIOR_LAWYER","LAWYER","TRAINEE",
+];
+
 const PERMS = {
-  CASE_VIEW:        ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER","TRAINEE"],
+  DASHBOARD_VIEW:   [...DOJ_ROLES],
+
+  CASE_VIEW:        [...DOJ_ROLES],
   CASE_CREATE:      ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   CASE_EDIT:        ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","HEAD_LAWYER","SENIOR_LAWYER"],
   CASE_CLOSE:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
   CASE_DELETE:      ["ADMIN","DOJ_CHIEF"],
-  EVIDENCE_VIEW:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER","TRAINEE"],
+
+  DOC_VIEW:         [...DOJ_ROLES],
+  DOC_UPLOAD:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
+  DOC_DELETE:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
+
+  EVIDENCE_VIEW:    [...DOJ_ROLES],
   EVIDENCE_UPLOAD:  ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   EVIDENCE_VERIFY:  ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE"],
   EVIDENCE_DELETE:  ["ADMIN","DOJ_CHIEF"],
+
+  CRIMINAL_VIEW:    [...DOJ_ROLES],
+  CRIMINAL_EDIT:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
+
+  CITIZEN_VIEW:     [...DOJ_ROLES],
+
+  CASE_FOLDER_VIEW: [...DOJ_ROLES],
+
+  LEGAL_DOC_VIEW:   [...DOJ_ROLES],
+
+  PLEA_VIEW:        [...DOJ_ROLES],
+  PLEA_MANAGE:      ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
+
   WARRANT_VIEW:     ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   WARRANT_REQUEST:  ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   WARRANT_ISSUE:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
   WARRANT_EXECUTE:  ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
+
   USER_VIEW:        ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
   USER_MANAGE:      ["ADMIN","DOJ_CHIEF"],
   ROLE_ASSIGN:      ["ADMIN"],
+
   BAR_VIEW:         ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR","BAR_MEMBER","HEAD_LAWYER","SENIOR_LAWYER","LAWYER","TRAINEE"],
   BAR_MANAGE:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR"],
   BAR_LICENSE:      ["ADMIN","DOJ_CHIEF","BAR_HEAD"],
   BAR_DISCIPLINE:   ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR"],
+
   COURT_VIEW:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   COURT_SCHEDULE:   ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE"],
   RULING_ISSUE:     ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
+
   ADMIN_PANEL:      ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
   AUDIT_VIEW:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
   SYSTEM_CONFIG:    ["ADMIN"],
-  CRIMINAL_VIEW:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
-  CRIMINAL_EDIT:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
+
   JUDGE_ACCESS:     ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
   JUDGE_RULING:     ["GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
   JUDGE_LOCK_CASE:  ["GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
@@ -445,6 +475,8 @@ const PERMS = {
   JUDGE_SENIOR:     ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE"],
   JUDGE_AUDIT_VIEW: ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
 };
+
+const isDOJRole = (role) => DOJ_ROLES.includes(role);
 
 const hasPerm = (role, perm) => (PERMS[perm] || []).includes(role);
 const canDo = (role, minLevel) => (ROLES[role]?.level || 0) >= minLevel;
@@ -529,36 +561,41 @@ const resolveDiscordRole = (discordRoles = []) => {
   return null; // null = not an authorized DOJ role (access denied)
 };
 
+// ZERO-TRUST DISCORD SERVER GATEWAY — Server ID: 1227422529656983582
 const verifyServerMembership = (discordUsername) => {
   const key = discordUsername.trim();
+
+  // ── GATE 1: Username must exist in server member registry ────────────────
   const memberKey = Object.keys(DOJ_SERVER_MEMBERS).find(
     k => k.toLowerCase() === key.toLowerCase()
   );
-
   if (!memberKey) return {
     authorized: false,
-    reason: `"${key}" is not a member of the DOJ Discord server (ID: ${DOJ_DISCORD_SERVER_ID}). Only verified server members can access this platform.`,
+    reason: `"${key}" is not a member of DOJ Discord server ${DOJ_DISCORD_SERVER_ID}. Only verified server members may access this platform.`,
     code: "NOT_IN_SERVER"
   };
 
   const member = DOJ_SERVER_MEMBERS[memberKey];
 
+  // ── GATE 2: serverId must exactly match 1227422529656983582 ───────────────
   if (member.serverId !== DOJ_DISCORD_SERVER_ID) return {
     authorized: false,
-    reason: "Server ID mismatch. This account is not verified for the DOJ server.",
+    reason: `Server ID mismatch for "${memberKey}". Expected ${DOJ_DISCORD_SERVER_ID}.`,
     code: "SERVER_MISMATCH"
   };
 
+  // ── GATE 3: serverMember must be explicitly true (blocks kicked/banned) ──
   if (!member.serverMember) return {
     authorized: false,
-    reason: `"${memberKey}" has been removed from the DOJ Discord server and cannot access the platform.`,
+    reason: `"${memberKey}" has been removed from the DOJ Discord server. Access permanently revoked.`,
     code: "MEMBER_REMOVED"
   };
 
+  // ── GATE 4: Must have at least one recognized DOJ role ────────────────────
   const resolvedRole = resolveDiscordRole(member.roles || []);
   if (!resolvedRole) return {
     authorized: false,
-    reason: `"${memberKey}" is in the server but has no authorized DOJ role. Contact an administrator to assign your role.`,
+    reason: `"${memberKey}" has no authorized DOJ role in server ${DOJ_DISCORD_SERVER_ID}. Contact an administrator.`,
     code: "NO_DOJ_ROLE"
   };
 
@@ -567,6 +604,7 @@ const verifyServerMembership = (discordUsername) => {
     memberKey,
     member,
     resolvedRole,
+    discordRoles: member.roles || [],
     serverId: DOJ_DISCORD_SERVER_ID,
     serverName: DOJ_DISCORD_SERVER_NAME,
   };
@@ -847,40 +885,81 @@ const riskBadge = r => (
 
 const NAV_ITEMS = [
   { section:"CORE OPERATIONS" },
-  { key:"dashboard",   label:"Dashboard",         icon:"home" },
-  { key:"cases",       label:"Cases",             icon:"briefcase" },
-  { key:"documents",   label:"Documents",         icon:"file" },
-  { key:"evidence",    label:"Evidence",          icon:"fingerprint" },
+  { key:"dashboard",    label:"Dashboard",           icon:"home",       perm:"DASHBOARD_VIEW" },
+  { key:"cases",        label:"Cases",               icon:"briefcase",  perm:"CASE_VIEW",        minLevel:2 },
+  { key:"documents",    label:"Documents",           icon:"file",       perm:"DOC_VIEW",         minLevel:2 },
+  { key:"evidence",     label:"Evidence",            icon:"fingerprint",perm:"EVIDENCE_VIEW",    minLevel:2 },
   { section:"COURT MANAGEMENT" },
-  { key:"courts",      label:"Courts Section",    icon:"hammer",    badge:"NEW" },
-  { key:"calendar",    label:"Court Schedule",    icon:"calendar" },
-  { key:"jury",        label:"Jury Selection",    icon:"users" },
-  { key:"judgesection", label:"Judicial Workspace", icon:"hammer", badge:"⚖", minLevel:6 },
-  { key:"precedents",  label:"Legal Precedents",  icon:"book" },
+  { key:"courts",       label:"Courts Section",      icon:"hammer",     badge:"NEW",             minLevel:2 },
+  { key:"calendar",     label:"Court Schedule",      icon:"calendar",                            minLevel:2 },
+  { key:"jury",         label:"Jury Selection",      icon:"users",                               minLevel:2 },
+  { key:"judgesection", label:"Judicial Workspace",  icon:"hammer",     badge:"⚖",              minLevel:6 },
+  { key:"precedents",   label:"Legal Precedents",    icon:"book",                                minLevel:2 },
   { section:"RECORDS & PROFILES" },
-  { key:"criminal",    label:"Criminal Records",  icon:"fingerprint" },
-  { key:"citizens",    label:"Citizen Profiles",  icon:"user" },
-  { key:"casefolders", label:"Case Folders",      icon:"clipboard" },
-  { key:"legaldocs",   label:"Legal Documents",   icon:"file" },
-  { key:"pleadeals",   label:"Plea Deals",        icon:"scale" },
+  { key:"criminal",     label:"Criminal Records",    icon:"fingerprint",perm:"CRIMINAL_VIEW",    minLevel:2 },
+  { key:"citizens",     label:"Citizen Profiles",    icon:"user",       perm:"CITIZEN_VIEW",     minLevel:2 },
+  { key:"casefolders",  label:"Case Folders",        icon:"clipboard",  perm:"CASE_FOLDER_VIEW", minLevel:2 },
+  { key:"legaldocs",    label:"Legal Documents",     icon:"file",       perm:"LEGAL_DOC_VIEW",   minLevel:2 },
+  { key:"pleadeals",    label:"Plea Deals",          icon:"scale",      perm:"PLEA_VIEW",        minLevel:2 },
   { section:"WARRANT SYSTEMS" },
-  { key:"warrants",    label:"Warrant System",    icon:"shield" },
-  { key:"bench",       label:"Bench Warrants",    icon:"hammer" },
+  { key:"warrants",     label:"Warrant System",      icon:"shield",     perm:"WARRANT_VIEW",     minLevel:2 },
+  { key:"bench",        label:"Bench Warrants",      icon:"hammer",                              minLevel:2 },
   { section:"OPERATIONS" },
-  { key:"roster",      label:"Staff Roster",      icon:"users",     badge:"MGT", minLevel:4 },
-  { key:"points",      label:"Points & Fines",    icon:"star",      badge:"NEW", minLevel:4 },
-  { key:"inmates",     label:"Detention Registry",icon:"lock" },
-  { key:"analytics",   label:"Analytics",         icon:"chart" },
-  { key:"chat",        label:"Internal Comms",    icon:"chat" },
-  { key:"bar",         label:"Bar Association",   icon:"star" },
-  { key:"leaderboard",  label:"Leaderboard",        icon:"star",      badge:"TOP", minLevel:4 },
-  { key:"bausermgmt",   label:"BA User Mgmt",        icon:"users",     badge:"BA",  minLevel:6 },
+  { key:"roster",       label:"Staff Roster",        icon:"users",      badge:"MGT",             minLevel:4 },
+  { key:"points",       label:"Points & Fines",      icon:"star",       badge:"NEW",             minLevel:4 },
+  { key:"inmates",      label:"Detention Registry",  icon:"lock",                                minLevel:2 },
+  { key:"analytics",    label:"Analytics",           icon:"chart",                               minLevel:2 },
+  { key:"chat",         label:"Internal Comms",      icon:"chat",                                minLevel:2 },
+  { key:"bar",          label:"Bar Association",     icon:"star",       perm:"BAR_VIEW",         minLevel:2 },
+  { key:"leaderboard",  label:"Leaderboard",         icon:"star",       badge:"TOP",             minLevel:2 },
+  { key:"bausermgmt",   label:"BA User Mgmt",        icon:"users",      badge:"BA",              minLevel:6 },
   { section:"SYSTEM" },
-  { key:"auditreport", label:"Audit & Security",  icon:"shield",    badge:"LIVE", minLevel:7 },
-  { key:"admin",       label:"Admin Panel",       icon:"settings",  minLevel:8 },
-  { key:"profile",     label:"My Profile",        icon:"user" },
-  { key:"public",      label:"Public Lookup",     icon:"globe" },
+  { key:"auditreport",  label:"Audit & Security",    icon:"shield",     badge:"LIVE",            minLevel:7 },
+  { key:"admin",        label:"Admin Panel",         icon:"settings",                            minLevel:8 },
+  { key:"profile",      label:"My Profile",          icon:"user" },
+  { key:"public",       label:"Public Lookup",       icon:"globe" },
 ];
+
+const AccessDeniedPage = ({ user, page = "this section", setAuditLog }) => {
+  useEffect(() => {
+    if (!user || !setAuditLog) return;
+    setAuditLog(prev => [{
+      id: "AUD-AD-" + Date.now(),
+      ts: new Date().toISOString(),
+      actor: user.username || "UNKNOWN",
+      action: "ACCESS_DENIED",
+      ref: page,
+      detail: `Access denied: ${user.username} (role: ${user.role || "NONE"}) attempted to access "${page}". Required: DOJ personnel role (TRAINEE or above). Server enforcement: 1227422529656983582. Not a DOJ role — all privileges blocked.`,
+      type: "auth",
+      severity: "HIGH",
+      ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+    }, ...prev.slice(0, 499)]);
+  }, [page]);
+
+  const ts = new Date().toISOString().slice(0,19) + "Z";
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"60vh",gap:18,padding:40}}>
+      <div style={{fontSize:60,filter:"grayscale(1)",opacity:.7}}>🔒</div>
+      <div style={{fontWeight:800,fontSize:22,color:"var(--teal-l)",letterSpacing:"2px",textTransform:"uppercase"}}>Access Restricted</div>
+      <div style={{color:"var(--mid)",fontSize:13,textAlign:"center",maxWidth:460,lineHeight:1.9}}>
+        <strong style={{color:"var(--gold-l)"}}>{page}</strong> is restricted to verified Department of Justice personnel only.<br/>
+        Your current role (<strong style={{color:"var(--dim)"}}>{ROLES[user?.role]?.label||user?.role||"Unknown"}</strong>)
+        does not have the required permissions. This access attempt has been logged.
+      </div>
+      <div style={{display:"flex",gap:8,marginTop:4,flexWrap:"wrap",justifyContent:"center"}}>
+        <div style={{fontSize:11,padding:"4px 14px",borderRadius:3,background:"rgba(26,122,122,.1)",border:"1px solid rgba(26,122,122,.25)",color:"var(--teal-l)",fontFamily:"'IBM Plex Mono',monospace"}}>
+          REQUIRED: DOJ PERSONNEL ROLE (TRAINEE+)
+        </div>
+        <div style={{fontSize:11,padding:"4px 14px",borderRadius:3,background:"rgba(224,122,110,.1)",border:"1px solid rgba(224,122,110,.3)",color:"var(--red)",fontFamily:"'IBM Plex Mono',monospace"}}>
+          ACCESS_DENIED — LOGGED
+        </div>
+      </div>
+      <div style={{fontSize:10,color:"var(--dim)",marginTop:8,fontFamily:"'IBM Plex Mono',monospace",letterSpacing:".5px",textAlign:"center"}}>
+        ERR_ACCESS_DENIED · ROLE:{user?.role||"NONE"} · {ts} · SERVER:1227422529656983582
+      </div>
+    </div>
+  );
+};
 
 const Sidebar = ({ page, setPage, collapsed, setCollapsed, user, onLogout }) => (
   <div className={`sidebar${collapsed ? " collapsed" : ""}`}>
@@ -897,6 +976,7 @@ const Sidebar = ({ page, setPage, collapsed, setCollapsed, user, onLogout }) => 
       {NAV_ITEMS.map((item, idx) => {
         if (item.section) return <div key={idx} className="sec-label">{item.section}</div>;
         if (item.minLevel && (ROLES[user?.role]?.level||0) < item.minLevel) return null;
+        if (item.perm && !hasPerm(user?.role, item.perm)) return null;
         const active = page === item.key;
         return (
           <div key={item.key} className={`sl${active ? " active" : ""}`} onClick={() => setPage(item.key)} title={collapsed ? item.label : ""}>
@@ -1291,6 +1371,17 @@ const Dashboard = ({ user, cases, evidence, warrants, feed, setPage }) => {
 };
 
 const CasesPage = ({ user, cases, setCases, evidence: sharedEvidence, setEvidence: setSharedEvidence, warrants: sharedWarrants, setWarrants: setSharedWarrants, onAdd, onAddEvidence, onAddWarrant, setAuditLog }) => {
+  if (!hasPerm(user?.role, "CASE_VIEW")) return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
+    <div style={{fontSize:48}}>🔒</div>
+    <div style={{fontWeight:700,fontSize:18,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
+    <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:380,lineHeight:1.7}}>
+      This section is restricted to verified Department of Justice personnel only.<br/>
+      Your current role (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role}</strong>) does not have the required permissions.
+    </div>
+    <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 16px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
+      ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
+    </div>
+  </div>);
   const [filter, setFilter] = useState("ALL");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
@@ -2084,6 +2175,17 @@ const CasesPage = ({ user, cases, setCases, evidence: sharedEvidence, setEvidenc
 };
 
 const EvidencePage = ({ user, evidence: evidenceProp, setEvidence: setEvidenceProp, onAdd, setAuditLog }) => {
+  if (!hasPerm(user?.role, "EVIDENCE_VIEW")) return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
+    <div style={{fontSize:48}}>🔒</div>
+    <div style={{fontWeight:700,fontSize:18,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
+    <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:380,lineHeight:1.7}}>
+      This section is restricted to verified Department of Justice personnel only.<br/>
+      Your current role (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role}</strong>) does not have the required permissions.
+    </div>
+    <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 16px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
+      ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
+    </div>
+  </div>);
   const [localEvidence, setLocalEvidence] = useState(INIT_EVIDENCE);
   const evidence = evidenceProp || localEvidence;
   const setEvidence = setEvidenceProp || setLocalEvidence;
@@ -2642,7 +2744,7 @@ const ChatPage = ({ user }) => {
 
 const CriminalRecordsPage = ({ user }) => {
   const [search, setSearch] = useState("");
-  const canView = canDo(user.role, 4);
+  const canView = hasPerm(user?.role, "CRIMINAL_VIEW");
   if (!canView) return <div className="alrt alrt-red">Access denied. Criminal records require Lawyer authority or higher.</div>;
 
   const records = CRIMINAL_RECORDS.filter(r => !search || r.name.toLowerCase().includes(search.toLowerCase()) || r.id.toLowerCase().includes(search.toLowerCase()));
@@ -2696,10 +2798,23 @@ const CriminalRecordsPage = ({ user }) => {
 };
 
 const PleaDealsPage = ({ user }) => {
+  if (!hasPerm(user?.role, "PLEA_VIEW")) return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:360,gap:16,padding:32}}>
+      <div style={{fontSize:52}}>🔒</div>
+      <div style={{fontWeight:700,fontSize:20,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
+      <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:400,lineHeight:1.8}}>
+        This section is restricted to verified DOJ personnel only. Your role
+        (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role||"None"}</strong>) does not have the required permissions.
+      </div>
+      <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 18px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
+        ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
+      </div>
+    </div>
+  );
   const [deals, setDeals] = useState(PLEA_DEALS);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ caseId:"", defendant:"", originalCharge:"", proposedCharge:"", sentence:"" });
-  const canCreate = canDo(user.role, 4);
+  const canCreate = hasPerm(user?.role, "PLEA_MANAGE");
 
   const addDeal = () => {
     if (!form.defendant) return;
@@ -3358,6 +3473,19 @@ const SimplePage = ({ title, sub, children }) => (
 const INIT_DOCUMENTS = []; // Cleared 2026-03-05T20:00:00.000Z — 5 AI/demo entries removed by admin cleanup
 
 const DocumentsPage = ({ user, allUsers, cases, auditLog, setAuditLog, audit }) => {
+  if (!hasPerm(user?.role, "DOC_VIEW")) return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:360,gap:16,padding:32}}>
+      <div style={{fontSize:52}}>🔒</div>
+      <div style={{fontWeight:700,fontSize:20,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
+      <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:400,lineHeight:1.8}}>
+        This section is restricted to verified DOJ personnel only. Your role
+        (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role||"None"}</strong>) does not have the required permissions.
+      </div>
+      <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 18px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
+        ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
+      </div>
+    </div>
+  );
   const [docs, setDocs] = useState(INIT_DOCUMENTS);
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
@@ -4791,7 +4919,19 @@ const PrecedentsPage = () => (
   </SimplePage>
 );
 
-const CitizensPage = () => (
+const CitizensPage = ({ user }) => {
+  if (!hasPerm(user?.role, "CITIZEN_VIEW")) return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
+    <div style={{fontSize:48}}>🔒</div>
+    <div style={{fontWeight:700,fontSize:18,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
+    <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:380,lineHeight:1.7}}>
+      This section is restricted to verified Department of Justice personnel only.<br/>
+      Your current role (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role}</strong>) does not have the required permissions.
+    </div>
+    <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 16px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
+      ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
+    </div>
+  </div>);
+  return (
   <SimplePage title="Citizen Profiles" sub="Population registry and identity management">
     <div className="card" style={{ overflowX:"auto" }}>
       <table className="tbl">
@@ -4816,9 +4956,24 @@ const CitizensPage = () => (
       </table>
     </div>
   </SimplePage>
-);
+  );
+};
 
-const CaseFoldersPage = ({ cases }) => (
+const CaseFoldersPage = ({ user, cases }) => {
+  if (!hasPerm(user?.role, "CASE_FOLDER_VIEW")) return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:360,gap:16,padding:32}}>
+      <div style={{fontSize:52}}>🔒</div>
+      <div style={{fontWeight:700,fontSize:20,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
+      <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:400,lineHeight:1.8}}>
+        This section is restricted to verified DOJ personnel only. Your role
+        (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role||"None"}</strong>) does not have the required permissions.
+      </div>
+      <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 18px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
+        ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
+      </div>
+    </div>
+  );
+  return (
   <SimplePage title="Case Folders" sub="Organized case file storage and retrieval">
     <div className="g3" style={{ gap:13 }}>
       {cases.map(c=>(
@@ -4834,14 +4989,30 @@ const CaseFoldersPage = ({ cases }) => (
       ))}
     </div>
   </SimplePage>
-);
+)
+};
 
-const LegalDocsPage = () => (
+const LegalDocsPage = ({ user }) => {
+  if (!hasPerm(user?.role, "LEGAL_DOC_VIEW")) return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:360,gap:16,padding:32}}>
+      <div style={{fontSize:52}}>🔒</div>
+      <div style={{fontWeight:700,fontSize:20,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
+      <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:400,lineHeight:1.8}}>
+        This section is restricted to verified DOJ personnel only. Your role
+        (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role||"None"}</strong>) does not have the required permissions.
+      </div>
+      <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 18px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
+        ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
+      </div>
+    </div>
+  );
+  return (
   <SimplePage title="Legal Documents" sub="Official legal filings and government documents">
     <div className="alrt alrt-teal" style={{ marginBottom:14 }}>All documents are cryptographically signed and immutable once filed.</div>
     <DocumentsPage user={{role:"ADMIN"}}/>
   </SimplePage>
-);
+)
+};
 
 const AuthScreen = ({ onLogin }) => {
   const [mode, setMode] = useState("login");
@@ -4869,8 +5040,20 @@ const AuthScreen = ({ onLogin }) => {
         setError(u && !u.active ? "Account suspended. Contact your administrator." : "Invalid credentials.");
         setLoading(false); return;
       }
+      if (u.username !== "admin") {
+        const serverCheck = verifyServerMembership(u.username);
+        if (!serverCheck.authorized) {
+          setError("Access denied: " + serverCheck.reason);
+          setLoading(false); return;
+        }
+        if (serverCheck.resolvedRole && serverCheck.resolvedRole !== u.role) {
+          u.role = serverCheck.resolvedRole;
+        }
+      }
       sessionStorage.removeItem("login_attempts_"+username);
-      onLogin({ ...u, token:mkToken(u), sessionStart:new Date().toISOString(), loginIp:"10.0."+Math.floor(Math.random()*3+1)+"."+Math.floor(Math.random()*200+10) });
+      const loginTs = new Date().toISOString();
+      const sessionUser = { ...u, token:mkToken(u), sessionStart:loginTs, loginIp:"10.0."+Math.floor(Math.random()*3+1)+"."+Math.floor(Math.random()*200+10), sessionId:"SID-"+Date.now(), authMethod:"standard" };
+      onLogin(sessionUser);
       setLoading(false);
     }, 600);
   };
@@ -4881,10 +5064,16 @@ const AuthScreen = ({ onLogin }) => {
     if (users.find(u => u.username === username)) { setError("Username already taken."); return; }
     setLoading(true);
     setTimeout(() => {
-      const nu = { id:`USR-${String(users.length+1).padStart(3,"0")}`, username, password, role:regRole, email, discordId:null, active:true, joined:new Date().toISOString().slice(0,10), phone:"", bio:"" };
+      const regCheck = verifyServerMembership(username);
+      if (!regCheck.authorized && username !== "admin") {
+        setError("Registration denied: " + regCheck.reason + " Only verified members of DOJ Discord server " + DOJ_DISCORD_SERVER_ID + " may register.");
+        setLoading(false); return;
+      }
+      const assignedRole = regCheck.authorized ? regCheck.resolvedRole : regRole;
+      const nu = { id:`USR-${String(users.length+1).padStart(3,"0")}`, username, password, role:assignedRole, email, discordId:username, active:true, joined:new Date().toISOString().slice(0,10), phone:"", bio:"" };
       setUsers(p => [...p, nu]);
       setMode("login"); setError(""); setLoading(false);
-      toast("Account created — you may now log in","success");
+      toast("Account created — Discord server membership verified","success");
     }, 500);
   };
 
@@ -4989,6 +5178,34 @@ const AuthScreen = ({ onLogin }) => {
       revokeOnLogout:    true,
     };
 
+    if (typeof setAuditLog === "function") {
+      const auditTs = new Date().toISOString();
+      setAuditLog(prev => [
+        {
+          id: "AUD-DL-" + Date.now(),
+          ts: auditTs,
+          actor: memberKey,
+          action: "DISCORD_LOGIN",
+          ref: sessionUser.sessionId,
+          detail: `Discord login: ${memberKey} authenticated via server ${DOJ_DISCORD_SERVER_ID}. All 4 membership gates passed. Session ${sessionUser.sessionId} created.`,
+          type: "auth",
+          severity: "HIGH",
+          ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+        },
+        {
+          id: "AUD-RA-" + (Date.now() + 1),
+          ts: auditTs,
+          actor: "SYSTEM (Discord Sync)",
+          action: "ROLE_ASSIGNED",
+          ref: memberKey,
+          detail: `Role auto-assigned from Discord server ${DOJ_DISCORD_SERVER_ID}: Discord roles [${(recheck.discordRoles || []).join(", ")}] → Platform role: ${resolvedRole}. Assignment is immutable until Discord role changes.`,
+          type: "auth",
+          severity: "HIGH",
+          ip: "10.0.0.1",
+        },
+        ...prev.slice(0, 498),
+      ]);
+    }
     toast("✓ Server verified — Welcome, " + (account.charName || memberKey), "success");
     onLogin({ ...sessionUser, token: mkToken(sessionUser) });
     setDiscordModal(false);
@@ -7258,7 +7475,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-function App() {
+export default function App() {
   const [user, setUser] = useState(null);
   const [showPublic, setShowPublic] = useState(false);
   const [page, setPage] = useState("dashboard");
@@ -7313,6 +7530,41 @@ function App() {
     window.addEventListener("keydown", reset);
     return () => { clearTimeout(timer); window.removeEventListener("click", reset); window.removeEventListener("keydown", reset); };
   }, [user?.username]);
+
+  useEffect(() => {
+    if (!user || user.authMethod !== "discord_server_verified") return;
+    const memberKey = user.discordMemberKey || user.username;
+    const check = verifyServerMembership(memberKey);
+    if (!check.authorized) {
+      const ts = new Date().toISOString();
+      setAuditLog(prev => [{
+        id: "AUD-RS-" + Date.now(), ts,
+        actor: "SYSTEM (Discord Sync)",
+        action: "ACCESS_REVOKED_MEMBERSHIP_LOST",
+        ref: memberKey,
+        detail: `Auto-revocation: ${memberKey} failed server membership check (${check.code}). Session terminated. Reason: ${check.reason}`,
+        type: "auth", severity: "CRITICAL",
+        ip: "10.0.0.1",
+      }, ...prev.slice(0, 499)]);
+      setUser(null);
+      toast("Access revoked: " + check.reason, "error");
+      return;
+    }
+    if (check.resolvedRole && check.resolvedRole !== user.role) {
+      const ts = new Date().toISOString();
+      setAuditLog(prev => [{
+        id: "AUD-RS-" + Date.now(), ts,
+        actor: "SYSTEM (Discord Sync)",
+        action: "ROLE_ASSIGNED",
+        ref: memberKey,
+        detail: `Dynamic role sync: ${memberKey} role updated ${user.role} → ${check.resolvedRole} from server ${DOJ_DISCORD_SERVER_ID}. Discord roles: [${(check.discordRoles || []).join(", ")}].`,
+        type: "auth", severity: "HIGH",
+        ip: "10.0.0.1",
+      }, ...prev.slice(0, 499)]);
+      setUser(prev => ({ ...prev, role: check.resolvedRole, discordRoles: check.discordRoles || prev.discordRoles }));
+      toast("Role updated from Discord: " + check.resolvedRole, "info");
+    }
+  }, [user?.discordMemberKey, user?.username]);
 
   useEffect(() => {
     if (!user || user.authMethod !== "discord_server_verified") return;
@@ -7395,19 +7647,19 @@ function App() {
 
   const renderPage = () => {
     switch (page) {
-      case "dashboard":    return <Dashboard user={user} cases={cases} evidence={evidence} warrants={warrants} feed={feed} setPage={setPage}/>;
-      case "cases":        return <CasesPage user={user} cases={cases} setCases={setCases} evidence={evidence} setEvidence={setEvidence} warrants={warrants} setWarrants={setWarrants} setAuditLog={setAuditLog} onAdd={(c)=>{addToFeed("case","Case created",c.title,c.id,user.username);awardPoints(user.username,"CASE_FILE",c.title,c.id);}} onAddEvidence={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}} onAddWarrant={(w)=>{addToFeed("warrant","Warrant issued",w.type+" — "+w.subject,w.id,user.username);awardPoints(user.username,"WARRANT_ISSUE",w.subject,w.id);}}/>;
-      case "documents":    return <DocumentsPage user={user} allUsers={allUsers} cases={cases} auditLog={auditLog} setAuditLog={setAuditLog} audit={audit}/>;
-      case "evidence":     return <EvidencePage user={user} evidence={evidence} setEvidence={setEvidence} setAuditLog={setAuditLog} onAdd={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}}/>;
+      case "dashboard":    if (!isDOJRole(user?.role)) return <AccessDeniedPage user={user} page="Dashboard" setAuditLog={setAuditLog}/>; return <Dashboard user={user} cases={cases} evidence={evidence} warrants={warrants} feed={feed} setPage={setPage}/>;
+      case "cases":        if (!hasPerm(user?.role,"CASE_VIEW"))        return <AccessDeniedPage user={user} page="Cases" setAuditLog={setAuditLog}/>; return <CasesPage user={user} cases={cases} setCases={setCases} evidence={evidence} setEvidence={setEvidence} warrants={warrants} setWarrants={setWarrants} setAuditLog={setAuditLog} onAdd={(c)=>{addToFeed("case","Case created",c.title,c.id,user.username);awardPoints(user.username,"CASE_FILE",c.title,c.id);}} onAddEvidence={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}} onAddWarrant={(w)=>{addToFeed("warrant","Warrant issued",w.type+" — "+w.subject,w.id,user.username);awardPoints(user.username,"WARRANT_ISSUE",w.subject,w.id);}}/>;
+      case "documents":    if (!hasPerm(user?.role,"DOC_VIEW"))         return <AccessDeniedPage user={user} page="Documents" setAuditLog={setAuditLog}/>; return <DocumentsPage user={user} allUsers={allUsers} cases={cases} auditLog={auditLog} setAuditLog={setAuditLog} audit={audit}/>;
+      case "evidence":     if (!hasPerm(user?.role,"EVIDENCE_VIEW"))   return <AccessDeniedPage user={user} page="Evidence" setAuditLog={setAuditLog}/>; return <EvidencePage user={user} evidence={evidence} setEvidence={setEvidence} setAuditLog={setAuditLog} onAdd={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}}/>;
       case "calendar":     return <CalendarPage user={user}/>;
       case "jury":         return <JuryPage/>;
       case "judgesection": return <JudgeSectionPage user={user} allUsers={allUsers} cases={cases} setCases={setCases} auditLog={auditLog} setAuditLog={setAuditLog}/>;
       case "precedents":   return <PrecedentsPage/>;
-      case "criminal":     return <CriminalRecordsPage user={user}/>;
-      case "citizens":     return <CitizensPage/>;
-      case "casefolders":  return <CaseFoldersPage cases={cases}/>;
-      case "legaldocs":    return <LegalDocsPage/>;
-      case "pleadeals":    return <PleaDealsPage user={user}/>;
+      case "criminal":     if (!hasPerm(user?.role,"CRIMINAL_VIEW"))   return <AccessDeniedPage user={user} page="Criminal Records" setAuditLog={setAuditLog}/>; return <CriminalRecordsPage user={user}/>;
+      case "citizens":     if (!hasPerm(user?.role,"CITIZEN_VIEW"))    return <AccessDeniedPage user={user} page="Citizen Profiles" setAuditLog={setAuditLog}/>; return <CitizensPage user={user}/>;
+      case "casefolders":  if (!hasPerm(user?.role,"CASE_FOLDER_VIEW")) return <AccessDeniedPage user={user} page="Case Folders" setAuditLog={setAuditLog}/>; return <CaseFoldersPage user={user} cases={cases}/>;
+      case "legaldocs":    if (!hasPerm(user?.role,"LEGAL_DOC_VIEW"))   return <AccessDeniedPage user={user} page="Legal Documents" setAuditLog={setAuditLog}/>; return <LegalDocsPage user={user}/>;
+      case "pleadeals":    if (!hasPerm(user?.role,"PLEA_VIEW"))        return <AccessDeniedPage user={user} page="Plea Deals" setAuditLog={setAuditLog}/>; return <PleaDealsPage user={user}/>;
       case "warrants":     return <WarrantsPage user={user} type="ALL" warrants={warrants} setWarrants={setWarrants} onAdd={(w)=>{addToFeed("warrant","Warrant issued",w.type+" — "+w.subject,w.id,user.username);awardPoints(user.username,"WARRANT_ISSUE",w.subject,w.id);}}/>;
       case "bench":        return <WarrantsPage user={user} type="BENCH" warrants={warrants} setWarrants={setWarrants} onAdd={(w)=>addToFeed("warrant","Bench warrant issued",w.subject,w.id,user.username)}/>;
       case "inmates":      return <InmatesPage user={user}/>;
@@ -7436,11 +7688,32 @@ function App() {
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} setPage={p => { setPage(p); setSearchOpen(false); }}/>
       <div className="app-layout">
         <Sidebar page={page} setPage={setPage} collapsed={collapsed} setCollapsed={setCollapsed} user={user} onLogout={()=>{
+          const logoutTs = new Date().toISOString();
           if (user?.authMethod === "discord_server_verified") {
-            const recheck = verifyServerMembership(user.discordMemberKey || user.username);
+            setAuditLog(prev => [{
+              id: "AUD-LO-" + Date.now(),
+              ts: logoutTs,
+              actor: user.discordMemberKey || user.username,
+              action: "DISCORD_LOGOUT",
+              ref: user.sessionId || user.id,
+              detail: `Discord session revoked. User: ${user.discordMemberKey || user.username}. Server: ${DOJ_DISCORD_SERVER_ID}. Session terminated. All platform privileges removed.`,
+              type: "auth", severity: "HIGH",
+              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+            }, ...prev.slice(0, 499)]);
+          } else if (user) {
+            setAuditLog(prev => [{
+              id: "AUD-LO-" + Date.now(),
+              ts: logoutTs,
+              actor: user.username,
+              action: "SESSION_LOGOUT",
+              ref: user.id,
+              detail: `Session terminated: ${user.username} (${user.role}). All access revoked.`,
+              type: "auth", severity: "MEDIUM",
+              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+            }, ...prev.slice(0, 499)]);
           }
           setUser(null);
-          toast("Session terminated — Discord access revoked. Re-authentication required.", "warn");
+          toast("Session terminated — all access revoked. Re-authentication required.", "warn");
         }}/>
         <div className="main-area">
           <TopBar user={user} dark={dark} setDark={setDark} notifs={notifs} setNotifs={setNotifs} onSearch={() => setSearchOpen(true)}/>
@@ -7454,6 +7727,3 @@ function App() {
   );
 }
 
-
-
-export default App;
