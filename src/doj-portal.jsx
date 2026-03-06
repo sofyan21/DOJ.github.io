@@ -4,9 +4,6 @@ import {
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis,
 } from "recharts";
-import DOJPortal from './doj-portal';
-export default DOJPortal;
-
 
 const SEAL_B64 = "data:image/webp;base64,UklGRi4xAABXRUJQVlA4WAoAAAAQAAAAxwAAxwAAQUxQSI0IAAAB8G79nyyl/f89X/WqwqUgulowJ+PwnsBlEE/lnTlx3G0GyJxjCe4Y4JbDyUy0U78dqKr9et4Aoeneu/ree0XEBKBFRULAvqfmF/vrP60/YsMDN3y0/tN6f3H+FPYNQVCeIuqx9+RS/8Zfz3de8ghf7jz/60Z/6ST2BpWikAAAcws3+1uvuX9OKTWHa1JKmfu/3urfWAAAH6QQJADA/PLakyH3xpjNjEdoZjlG7h3eqy7PAYBK96kHcPba1iuSTDGbcUzNckwk+Wzt2iIAr50mXoDFa5uvSTKacewtR5J8tbk8D4iXrhIP4NIPT0mmbMZJtZhIPllbBuCli1SAheubJFM2Trhlkty8vgB47RoVYKEakJaMrWjJyEHVA0S7xAlw6e9XZMps0ZzIZz9cAkS6QgJw6W+SydiylkhuXgKCdIF4YGmTtGxsYUtGbpwBtP0UOFNlNpmtnY2DqgfRdhOB9nfIzFbP5M4qENpMgeUtMhlb3iK5uQSnbSWCMxtkNHagGVNfEdpJgSs7tMyOzA23l+C0hQLObJCZHRqZK4VvG3FYGdCMnZobbi/BtYvCV4mJnRuZr8Bpiyh6NRtjB+eGGwptDcXKgJEd3XD7PwjtIA6riZmdndisQNvAOb/BpmGHpyatwsnEOac1M7vdGm545yZMoTUjOz+zVucmStGrGVmAkbU6N0EBHw+YWYSRtTo3MQErmZmFGFmrcxOiWMlNw2KMrNW5iVC3kpuGBRlZq3MT4HDiDRsWZWStzo2dc3q3ySzMyFqdjJk4rZlZnJG19zJW4n3NyAKN3EAYq4ANRhZp5CrCGClWGVmmltIKdGzUXUnJCoXW5HPwY+Jw4g0bFmviQ+9lLCTM3rXMgs3cgB+LgIqRRZu4Ch0DlSv/i1Y2ltI56JE5d+INGxZu4sPZIEel+NMyizeyQjgilavMLF+Lw3PQI3HuxJumKSBmPpwNchSKPy2ziCMrhCPwuMDMMrY4PO90ZKKzD5tSYuJ9jC6gz8hizrwKHZG43qCxcmrsTU9kNAG3GVnQ0SqEkaicH2YrKbNBT2QkuM/Eoo6sEEaguMjMsjYb9ERGcd9Ki5EVwqEUF5hZ2maDnsihZh5YeTGyQjiEYGHXrLzMBj3IwTyqHFngkX0NBxJZHNBKzPhsRuQgQT5hZJHn3fPQgyi2mAuND2YOolhmZpmb7Z6BfCjgd4uFxpQr9R8QLD6llZrxmYfsF/AJI4s97y5B99OwxVxukX9o2EfwUaKVm/Gxh+wJ+G+OLPgcl6AARI9vM5dc5O8S9mBml1ZyxidzEEDxn7e58IZn9wT5nZFFH+0TBAjmntDKLnP7uIpgYVh6xt0ZSMBNiyy85u0laMA3LD1G/ojgjm8xl9/3EhAirfSMO/PA0ts8BQw98BMjiy+/XwI+nwIY+ROO3WOeBj7H6Xe08su8d2xuZxowvju98GI62Jm7Y4nTwIuFnzgNMNmdaYE/3ZoW1h+xmQ5+4HSY+FszHZC7/L9Xm2lhl9Nh4m+P2EwHP9ximg7Wf5oWfpoW7M4dmwaMLxYWXtCmgZ25uZ3p4N3p0++mgcx7x47dYy6/yM+BrxmngZ+A61Z+lt8vAWde0YqPQw/MpWlgZx7u2N/MpRf5o4QZ9LlbfPYNguLy28bKzjhchAhmdll8T+cg4o7fYy67yHUJwAwq7hZe/hoBUFyOTdEZ01kIIPBPaCWXeS84AAi6zlhyu6wwsw++zkXXxMvQPYKzu2blZnzsIXug4QFzuUX7XQP2w/lYcJnL0P0EM49ppZa5BcUHg/5usdRi/kTChxTLzIVm3P0I8iEotpjLLNuDoDhgkE8YC40XcCCRxQGtxDK3oDhwQMVYYpGfSDiYoPfUrLyMg0WRgyHgd4vlFVkh4JCKZebiMhv0RA4DxX2m0oqsEHA4OT/MVlZmg57I4RBwm7GsolUIGKG43sCspBp70xMZBQIqiyWVeRWKkYr03lhTTsnuQzFixVXmcsq8KH5UUNxnKqXMP6EYnTs/jFZGlgcnxI0OARVjGUX2JeAIJcw+ZC6hzIezKkcBxblhtPKxODwHxdEGVIzlE1kh4IglzD5kKp1sd2e9HBUU51Kysmn45gQcjl6xylQ0Fv93xSnG0WODuWQiKwSMpXj/kKlcst2dDTIe8DiXGyuVhm9OwGFcFSspWZlYk1ecYnwDVhmLxFJagWKcAzYYSyRyFQFjLd7XjOURuYGAMRenNWNpRNbey7jBOa0ZyyKyVicYf+e0ZiyJyFqdwyQ6pzVjOUTW6hwm0zmtGUshslbnMKnOac1YBpG1OofJdU5rxhJ4z1qdwyQ7pzVz51nDWp3DZDvnN9hYtzVMlYfDpIvDampSl2XmFThBCypWGqbuihx8jGNox4D/bLPpKGtY96BoS4VusMldlJkqD0V7qsOVzNg9kYMVOEGrOixts8ndkhvWPQS0rYdWmbFDLDJXHor2VYelbTa5KzK5vQQnaOUA7SeadUE27vQVAW2tDkubZLS2s0hunAEULR6A1R0yWZtZIreWgSBodRX0+gMyWVtZInf6ChG0vgK9akAmayNL5KDqAYouFA/0qgGZrG1yIgdVD/CCjhQP9KoBadnaw7KRg34P8IIOFQ/0+s9IJmuHnEhuXl8AvKBjxQPzlzZfkZZs0iwZ+WrzEgAv6GDxABaqZySZzCbFLJHk5rWzgHhBR4sKMLe89oQkUzYbN7OYSPLJ2jIAKDpdPICTy2tPhiQZk9m4mMVEksMna8snAfGCzhf1AObOXtt6xX1jMjMbnZnlGLl3+Gzt2sIcAK8oRFEPAPPL/e8Hr7l/Timlw6SUUub+r3fWri/MAYBXQUmKeOydP7l8+9vHzwcvOfKXO8//utFfOjkPAN6LoDxFNHjsnTs1v9hfX1//7f3B3v+2vr7eX5w/hX1DEEGbAgBWUDggeigAANB7AJ0BKsgAyAA+jTqWSCUjoiEx2l1QoBGJbAhwAY2B2LV8k/1n91/EL3VK0/gv7Z+0/757tenzp7zWOiPPx6Ff09+q/wC/rr0oPMH+5XrH+jD/AeoB/Y+pH/c/2KfOY/+ns1/4v/z+mX6gH/r9tngUP9B6PfC79R4g+Rr257YchLrfzV/mP4K/ff3n26f0veL8oNQX8l/qv+t8VPYr7v/pfQC9m/r//P/yPrE/Bf+D8sfcz7E+wB/Qf7N/y/X//keAp94/4X7XfAF/O/8J/3P8V7H//t/sPPX9Uf+//T/AN/OP7b/4/8b7cn//9xv7of/j3af2x//7rQmPuoj6XhJk16xXtwf5abYP6U+znS5q89eYzQcZ2wSJOv1nq/oOs8Fi9WayAocWBffqaJT24K/ZNV8//eeBIHSimwCkf95u+qg0y/EqfTI3Dez4Oj6bfb1VSHvDXdA8IFpO1ykMjEek9kS6/9YF//2DnKst9F9sXKMsG6Af5eTTWhPHEETwquBeHH5miO0R5bD4/6e9209Cl6yv+DrSrByozI8PP8Xy3EGtG4HjdAz1TpVijnHO+dO8YsveuWl4ZJZMnIN7o3rbsgl60XzTzSy7IVEcUWd0ouEKxOwg7Y/EEidX/vT1gba6NKO8484JIIISOOTCnkuZnIru9hk/b6/HNH8dZrgDZAmyBbg3Vq9ogCmOZ3Hw5R5xKGAwbEcZDlIkUYp55UBtkH5i58XljwU9nJT4sUc1DjGp1NZjIy0HjMO8eXTcVj8eXa7V/Nv6tKD9yTcgN/5dKUfcSWZSRRqqwXKuaBScNIfgzoc18cqbrUKqPCF8sURYTvnGfeUbVmnmpWnmlaBew9ctE0b+oND6IiPXcJkM0CyjS72d/R2XDDbB1EtcbxndiE73OcrlD19Z9EVcVSj5tuqFVW29++5eLQ8c2kQElR3os2BNIeQuF0/norEf/4u4WRbOM9vCyCv0y+8psyd0FgIWnGO7hRG/vBh8awJyHs58NmlDfXGHdPm8AqWxdjUr+FY244sTXV/Yh2kIUHhgAaMGE71WTMXl8xr5EM0adJi85jfUHe8v836i8wiSKCSzT+Tsfu53V+0BQzAW0esLgTGIdj9Tn1zexh918rFG9N4elv3Ak/GUMspTWIPFHD8dsFkwsWKxuaOTcns5tqRQrJZzImjpTYSEcv6XOyLEujzvm9C2q+UCjdAn5EfWIyOPsqsFYvPEhFcl2Pyi5xQYY8tX1xJ41TC01BfRnYLWCk7gY2fruHvFcRf2VxTc2bmUsCf5Mrv9pmkpf8+cjDwcc0dubXYXQadXEvFaSFz3mhTb0PzpAAD+3+gJZOt27X8Y3b+Xcz6Y+XBE0cYox1tbn9sikFEtVmKOKAlyjuQceGDiXc6RSLgIbYEqZOYBd1/Rq+rl+sa+SnbQOS/JIcFYtkiUs8dfosqw4Q2kBJR7iy6XAd1YMtNtkeBBNXH0RuBd0TU23A6iPXKTLbzAwbBqrd2ukaaIxo+JvZ4BFiR0saVv1jw0M2dox+zzDQtxJ4v1NmNgR9i2zfFhtSDZ9rtcNrC7Z2Rh/tXTlUcPi3b2/vQHfD0O4k8K7ayVToDhGUjQzcd6q5mC86CzzqGeKTo497M0ECnNvu9LzKuem0r/GNIBpbtAcldj256jHfduHHmAe8jr1Qu1ihwjUUISRYYvhA8r6U6a4G2tfPG+caDiJppz6HjD5aBjcgETiifkYd/5++6bWnu+jAAWaU8WYpxODYUYvoYOqzZecNmWTWFUdopISVdk+8BrxNEMUcKg4iCEdCanQnmcD8O5J92Rtxx7ri/DasRlDMY6EvStODB5HiFq7qoBb7iqMM/y+l2fOsN4kzeqmXaADrJvHF4dpVloDGE3P3u80jQ721fyUpWq1syN7mllNwzvTAhloNinVWVhrK0vYihiz9Lwt+my/U35p21+oZMTceWKyve7lvVBSN38Zp8mAMHh84S32GW0nRMvAoSbPULIBN+DhAuRHBnMBKjrI8ewaMBJIeT1+BtLNXhFuInnChOp/QDVHquow8Pj8qxHmRv43JBlh5qeiUIl4bNv7hbTwOJsa8HzZkL6so5yPTboY6jKsA1Yzw7bqzZ11lwxX+5kCct2nLziKvhl2ei0WenhM7st0V543Hk7srVd7yWcOOeVviEmTvm8wIONFLLXT6dsc4ZpbMnFrWIav/gxpn4ooX4mGXNR3RUgMgoXBF4YzxS0pKSxNnUd6er0c/d4Z+StdyYKaAeWzRd/6RcGSPY0QKhdgPxYMDBb8UWEPFbrOklRSrL4DcqitdHN5Ljz0Ah0jzOxFpwBguaqy9rb81hnwjT8P1MFdNif2Csx4BeFGuy9daaQCbclbvtWnrwJS6p48z7i69n/nxqLHJMq3QTzefNlw1GWqfApGW5zBdIEx416jIe4sSc3cavJJDk3QMEZQ3hqy2yxMGe4GFye+H8mKrdQZOma3iIlKeo+2kmjZHWT8CRcMrs8BKDFlQ6GplWXzaTYbWhoBFfzukLWUmY8VGiRUlFbhzJdbudQk1zaprslnvWpxikMykgAsGT946FCLGG4Y4/v6SdbvzvKsUrJIBvofNje4AgJlEgeoShwRrtZoXXI7uJlM6DFcOtJ0M2Yvisf3SDt1ea9RGZTguNMB0AThHxFm4b5w/9mYbOpNY1ReKGgMBEMc8O0AItvbkgXiACkzmcVghk1RIQfggW9pDMQsd+q6JJAx4OucAvKd0N8nSncmOtkG9jdVZeMF+Nk32vMTcjLHZ+Ck4kSXIGo8Otf3+/VLyFnTVgWXIq1N7V1LG+/Y/jGhxjcGWL8rNFgkx0tKOFqFSYMeY0NQGfU2F0UhXiNA4zX7nhrznP6YvU56uZ22gBpF47m5rM541fH7pAhSYId1puPI5hcRBaBG9OTezMPzVMQcA3tEzYl3WcUZQfup09tWtYjCIahAu+sNq23uDzFi46kLduQrM1aIU1y56jmEpLRjXK5heC6+Z9mTvBbxlnn7x8UajlIuFHX0839Vk1wRBt8cfCt8+exjpulePo1kt/Wjb6Wd4A41JAEDhYh4BtgcmmkVdX7jT6UhYICDQ4zCyAhQr7nFl5eyl69KF6i1edhyTE5EtLumGNh0pKPKNXgf1usuQW8MrrouoiKhPsnAKEEN4NfnAYQQN4eQZMho2a8jnchbOyZKsJscYczERjdTqfAiMkS+1aqGYX0fyzIjlkbj2msbrti3s7G5g5pIVctPInl3X3P+eErhni6uEIf58/n8arej1qLhRllkZKo363o1iLrAIt3Fs2nYoTjffNGNQJEErYvRopgO+uEOhNidzCGNhh4EeVSk/OiwRaaQCxyDqpVKitM/x7e8OAan1nhfpc2pj5qzN7I/NoFrKGy3EwqrPmS91HtA0Wjls3Icj5eYo1LNE3k+Rda5HW+Imu0tocSNhW6U3kn832TM8e2Erso8wfMn5Db6XJHPfxMyEGUTEWUlraEpIWKYIg0sxp4U5dsxN4OlwD/tBxeilnYKEA+2Dv9Ku1LUVhcXM9ZDTNvlPMP8FeMFAmxJqsMulMD2gG21xpnPVKkUNvxNbUTO0TDITJPkFlcURGrK+yRJlBDDNPK2Ob2Q5AfCpa5Tw/UWnZoROVszehfzUSJ5QFXHINFx0c7LC9rfNRGSu8QdgPycrd6lYhRSBZVJvb/uUH00n1eRumDd8cxSNayTw2R93SweeTV3zfLD5BPx5HjsB8V00VlaPrNkVTidgeKhTY+Kmxfoo1G2LvyxDNKGsnUyomUeqT3prD5FLcKjv6yseWrTTzfy9TCRAXIKo1kwvUsqGasMr/ojWtj2EkJkJlTF5H3DlJATOCoNp5khdZQ1I1Pot9Y35JVXhFi40+4oh5r6yrVX3pyFm3cfI8Bnxx9Z0RE/W+D71B0t0Si4nI5fsGhOHyl0+bo1bSvVOwDmQFxb/kowuu10HOLf8t+jrgvm8Y3ngteOFxXtFHRVTslCfKVEAhtmQER1xPdvn9vl58XxzhmDicUUHGeVfb+qA7q8JjQhGlQ4oDPSq5nn6pySUtVzu9W3nXA3QClF3jK8+hCOC4aWjWtA4BxMYtP+uGX1p72uQx+ujfI/8Gbi6ziTaDjeVQp7Vu+Kz58cZuCFxo5GgeSfwWzXYFd4gsbgMwcVmRr/4HPYja6/kzowpLvuE4i4uetFmnKqVfw30a+kwYdet0fZ8loM58FzSX8aPMkf0QI74QKGaC5d8ohFMAER8FIBW97gz7A8fLtpFxq646O7Q8Oeed4W7aJnFoY1gcBMWPv6w/Gylf1ygXxG5Bu3oLJXTKaJZ9eHWs7ZDCX7kQ9akJnaIV8erOmeK2Nj2BpCGL5SJKbMsCU3+ayJjmR3hCCg/AUNVXioaC0O1VgvglP7IMZGEHS+z54TAgmQxdLN3+Dq9gzZf3BMk/MNK1nvNbUrIwWD25HW5m87bv36am7mCHAzVYMka3gJYvIBwJNDV/E1GNyG16Hpkxa0nKn0zyu2YzSBT2RMDe92IPTg13RMj+sHJ8786voXdR1QcfFoEY7WFlAVt9PumnRvhIC5uqGFnnhwj2Yoo+A057wgH4UOkGfQ6ZTNiZI7/1lnx2gUHm4Ua+1370qESCRgtQuECAmz3tpaKxetCkaKdbL2fVTfUMMymc5gzMoqxK15BxyNf/7G1V6vxB2USaMyezQxrabqSVaCV5Pmni9lYIsBicoxXtyx2vEi8pk2M43K+UYDPhUmAs37eD5szG9++M/3/VtrO93m0XSQCZwNiRzrCYLMnC9VXQLC/aRoumHAsyem0PCplarZxwBgDRUCxgut40udLg0k0kC9QeryjwyX4NThGdNVYnJEacBJTRRb509BQ1Fgbyk3J7+w00SdrXWy7ryG0YGujHxjPAq5cFGABrO2TWjsnrwjRlS6xlSpJ/mb+CQAKue00JnIhmQERKWn54rZ3OAp2214Qffe5JGAYiO4RF8fw0Sd7fPs9p7cVykDPUfXfcMzdrJsza3ZJWsl8ljMy09y/o5dQ3QYSyfOR/6yT1O1Hvn4Ty6vKvMsHr1mLR5VU5i4FOFo+3iS2c5lZNmHzJD7rPI7I94veYmQ4Np21P7uvHXdDRcaS4CtoKGdhV79rUICBxutLNw7QSepi0XfjrLTnwE5tRBCQewgQXzGIHxFzZty/kJ8O+bVdtR1Z0DJCHgB7KcKOESuX0gj4lkkLns7jU5c9Z0/u2kDYZdqIG4weX8+mIQxVXKjNieuwKPXtO3683dc6rmBBbTRxRkX3jIIrJr4jFSZ0y56ukUGSid2KzRWyrLa8FPD1/Mwz2cZ4NZdGQmAtgwtklI8mp4NvEKmwOOTva+YE/wV2Iue/71O8feo/uppqy38RP0V/ClcEDxfFF8E6gt9WPl8RkKdCva7zN8sKRgsEfFKg/HTwXVfTV8DzpH41+ve8TTL+JIzT/DLxY0HS447WP2grxZ91LpdhycaGpBNLsmS25d+4ZwYJG4tQr2WRfD4lyVusenix+e47N9PYNA5ZPt+Xar6UDO6NVGyhyj6DGaTbNTH4VapeDdou5pgIE0rmhV2C6lORSU14Fg/b6N0gVAn1Qymqc7Hv6nG4Xu1fN2cV+nGqdrL2bh1IPwG0PeUgouD34eHs7VY69XlbVy6PquVAltmAa2k3vupVZsIL3fNMKPTGNrKwdI3MOkbdLQ3UeZpSVQ/uvrvudsOZ5q+cXWwLjnKzHLxERDNHDJDpgDVbiUAf0y2qE8s2+MYhF1oQ9k0KQUeUae2ztnmUVpSIEfnUMVsg+AMflCm7UEuLYOj92VxETQJlTzG+rZxTKy+zVa+FRRVo0I6f2cu3fl2nF4lb6TiRpzYxd47IXDBAAnNm6PaNFfLguXDWJoOJI1PVtlUPH0+D2WI28JRMDnTHHDVE9fCzR1BfWQwK2nP6QRbV6QCr1BRtIYeQrGc46XxLd11g7DYZ1IwFr5uMYhZ9gP3SJLyoG6MLWVM0LuqY0K7pVmBI6aShnubJ5Q4YtnpVsVlk0Wf7n/4k1QIHHYCnbqqo6AFE+80c8sWed4bDSbvqSvSUjRkktawnPCdZuBFAI5fXWqSCMnoaprJrYDAESlOEfpyBOca+LeqgPU4y/o2+uY9q1W6fXj5LppZC4eoya10X4x81aXBR7n7/kpn00hcJUwNMs7/Jd3mJoPNIqBQ+VNwrMCkfYt9GMs/6Zchh6svf0WKwzcarpgv4R9kiC8kntzmewHFqNQMprGp+2IaYISpOXqb+hJgkH/YjjgpibHdhCw488bDKfSC36QXpWHkwbx/H447Ye9D5TPJx+xXTy2QHTxrD4jl3kORSrIZtbESWEve40/BBpdgANqhin2Iq2nlyx/kt5cZkkBDOcsHVa75UeJf6psTaJKFzIOfGBzhwwrd29/u4VWyfzQRv0hoh3lqCty46WI7ygCEF4YGb0rrkpc0yOZnNSWM/VC25HOSzHqaY+MAAhNWC7BWrQY09urHQySW9chS13kDXmKKuxmc415VWSTIVYR7DXVRbW1hUqLgv0pYXI9Tio6GheeZ5tzcyioOMD15iA3uQUtckUVuX4by1CpIO27a6IiOww635FsNHpbepNgzC5D9xFzpqGAJlJe8S8yS3sVUb8XxVXCgVQ/icqPMAKXo37Pz9wDYC7DNxRj9HdtrVyPMqgij4RDrfpgukCqWPXlefdIbqc4OCYu1C+fPne1Jb5mfCWWfHsMvMoLlk/33hCwwLQ7r5BGSv6+FoIFw6029nB8szPb3gSQ0zokkD0KGbBj+boir075gEO4ynTVXhh58PJtMFb2s6wWaYaO/jjCphyremLFdyxcbgW/gp72XNq9tine/G344yprceiQAxLRd+UJJXT0/QVulyff+VdNySCLZf0Ifo/w+ytINxzzPSc0ubhYC7st0z8vH+k9s397PR32GnIlRgsEAn9Jr23wbRNaoQOHPNdiOqVacfQSTSrI32mkb2kgkOGeF2811u3IToh47dADFmPxAn/LgvFT0JPQSWHXdPubNTp9gvZFyBFQVNm70zLPeclnZPLXUSrSRjYuQZ+86hgUih6+yVIBIbKbih3VpescWgLA6LPEzsbfiQL9J5vzIfhlmzmdkB4WWmywGum2uZQ1aMjx0k88KKUYeCTRvfE0bdrdNEbYVrGY0biUt+GD0aTqsDmqvn1jugZSK+TYCXVeM8392EKQB59pPgu2WG+XGuW2U0UeV8yw5+E60PTorfuDtqx4rPq9r7ia5215U4kLpBbP7qPDmxnJQOrheaacZes9z2rQ6H7j4MZ0qPd23wPuVRwgdYZz2NKrnK5Jax8iOJn3uINYRC7jnt9ZUknMu9HeNADPm7uswTb/sKGyTRFv+DrYsCkt3GVELupykpsrevjp7AhBRcjUD2Y/RwmD4GUfvqEUrBTtJ+wwzlA5SVAWCK1SHDmy8fzV7d8OSeTCoAN3pyEb5mg1+szDSG8KpZqaweGIm5pUX4wGEgNL5YKoBsbcf088JQzj/QeaODeBmLa70qhM7nwk3BZcr/pGlx2KBL5KE24VIrDnEW7hKxTdFaju/3TjKZF05wpx1l4q6F6fIB8NRx5nHafOefQZXavO6W8EVJOX9QwRdt5RLbqwPnRqQZyAfQ5gBU8ueT9lExIhw6n16MCKPCIeCj1FnICzPjBqAsPE5XfmHy/sQh8WNq1xnA9iNvNBHrbT/sULwRYVBPQL5epmKbjaFApHst9hXjWpyYE78f5Xhij9VrDon/7Uv/jXHemql9m+S6IpzzAdTLj9cJAphAC8+h6Yq/nWvgwoUnQsVyXHH/8cnxPWygwygV/6578xU0+oH3GUMv3Nj0Kl7hJIcQGVM8XAKY5tXCg/6GN0Iw/IArXWA9AK9RtYTLvZMsAWfhbE984bnSd2Vkcj6+aq0gsX/wy4a2BcFZj0cVJWgX1iSo2rH0RxZizAfsoXpEiOdD+DZ3+N22afcMUxtRglNxfoimgifkmOsryOEHae/lMKRIrLqJ83zPDENlzNjdnTf7XQiariWTXS3QAtklSR5DtkE+0/YA3sHbAYz+YoM7rVao1wXN9N/vu9mscFLIGsHwF6a+5LBoX3Af4bULAQbwtpXaZwpXx7IFocn2lUrYuzfXiL6ZpN1cnLsHnzRiemlc5qMe/Xvoa16fZP4btkFJpe71UvJ+gb8rUX23PlPjxPlnvuuecJPMlElQd7TnEwSRBXi/HDwpd/aCuMtOlJUQDcCTk/plHU0q+XNPNjYDyXfffCty507cHUNFvr4W9EvLhQhkzSrpPc5S6ao5NXE7JwmD9kHnLj5mKSmbwdKYwgzcOtUCBY1kXSrcvoKytBk/bh7oPDPC1Yssk+CNtWSUkV0P1tmYysEbQrQU40wIIi2cKY34T+CKHSlgUOe5Bk+t8BqQOb8kFcUNvsdEaZd3D9JAwS5J/SsYo0Y5fBIcxyWX+Xk92nbAZRY6YSdIf6ohz3YTLxEEysN2dnsJdaNQyizKCe39XLMHtRnF3tryQ/g6oS3YLgclKLbzz13azg2dsHbHoBBZ6neQPDOsschhyIqAgYIXl2gCOdWVVLrpRd89xck+hiuPS/Ad6Y1sv9FiSWZ2b27NE3jm7N/RWCXnX6m9FcN45zqNdo04mu2F+Rm1h3dbepmdMHCgPfpgwGPStdgizP+2ox9IR/6VFY1kdtREbOPstdwdoHh7JeUbDhy57Y6HoRgFmZ7N6E8Sg52+PSUvma34z2e1u4XJ44uJth6/tjkPNXyOZTc/qSkek1RpFTCRkQRjVaMD+vQlWW8lqFirAnllu7WTE+6A6xh7tmRCXklTnnVpwzcmV01y3eBTgR8jY672ydLzujQuqlm6D8Dx2u2h3qK8pFycZOREasbfuvV14NDB99o/09A7Ht23PWI4EakrOq5kLM7nRbKU5PajFYNSNM/HWdLcWIt6HktAYSVSdIxfpovphgkwTuVuuhmwjuSieNpD060w3yo3ly1JBZDSVq3U6TlW1pph2n4QRX7oM65hoMlF62jJlnmYNPswitKQYV0cfWUjD2M4vLVjCCdCpt8Az3x9l9Xok//EKzKpYPNY5FK6ahYuJ1ZJpWtOM3ex4lB5Cbv11qbXlAWjF8O2Dq3RYMkWPZWhQFYAJ/MS7ghd176/TgTVg66smzk5Gmip0viIizKTI+9VFRJw2Cd3B30eU+Elorm9NrxVP7xC4UydxKoLWFXK53gG+DQ5o7quTG/fbcApJGcECiaGd1zaei7O6rr155uXvDoTeDAtcxduQgKiWrFpsc8fbzpuC1xM4aqFi5oWfExxNSS8HsuGae+0NkNMquCjpC1Ubtr5VVf4NNysaQhL0f5kqvwB1uxwc62TmaUeZFFj0abG2j6BOas1srpv4ps6Zx6zBCvs3Vge4/AMSi1qfGdMLwykZHSs+7kLUDt5sgZBACZgXUKKEKQCjH8EjfItW4ezQy5WSVU95EugQQC9ae3e0Pz0Lb2d1EDjGLihwp9+78k0NHp7u7A9i5lkDDNfKGcLQppcbLr/yIzCQgPkB5UVhS0wjFj4HmGaiQ3EhktnsvQVD4b8OQCbP0MuRsM4FNcqckC+18cEp14EuOY6W6zLoAOGlQQCkbIbE5a6SEiUPJo/OlWG8QN8UplyEdeLSuc2eFtm78z5dOW/gwV1zcnRN5tbchJ09PMrUNkDvJxpkGGRzyeb8AM6GRlfMNaRxmvWO/2+6Y1xT5JBwVX82h4TR7N36Fa0Tx3FCwzlkVI1KEzNAqZNwf5NMsfRfDsT37V9WPeLtEde56Gn1/c1wgejt3bP/Y4QN8g8AlndVJrC783ezEn74xaOuT+ZaOfujQt1VqD8waihEXzOW+KhNFfLhJZpUSqYrANAF2Ru4aSnhZ2UDxmN1wnrrMysKp9ZWxF2PlBmSGUSbU2+fbPlbw3BQDvx011IitiWnHRbhuvc01XGlrgHMpmtepsOeOIL0demjktjkEsXodsShVINU79kNSI2RjzOS9rI51oPyM/urYhdVpc5qrnOJ9vtAatsqVclVItrYGsLVfVrf7Hjxo+7juJS1B/eBn2/MFQxZwgUtgv59wkIjHOkI8ufg02qsMGdZJE1akfIwrGbVb81dTa5apHwFeZXSx0a5Ol+5Z5/3phEhn+48dnq6oQHSrdojyqaEZWUFzQH32WKMCVbN/afylmhDP3VPsdxQqt430PBzjQ5Y2wk2X03jfP3xwe+8LlhxbPr6PaVFIAOmo8BGKbh7mv2TalWTQrhlRYCFDSfPXOfh2MPEjaV2rQHzAXjipUq7XIVhICuaouDi3rdRcmJwxxMUhB4kxhxNeNi5OlF+S9iH9b1PgcUWdruMs7Ai/h1VlCfaMT8hb8cwkerXihdsgwhc7C2p3f/4A9pGmyiaStkdhWGchALSgGt12hBiEOsoMAGX1sAe1q2KvcGL0/JPHHkEKm1PiuvZ4XX+Pyvt4mXkA17tJ0HZX4aI7QKbpB5GTZ02kqAbqQtblUHdxlnIgXumhRco1Df/V0GGB4e7ciIPS12NMdqqbVpy2DQjecGPSHdqd8w0PaPu+GeddnMX7gTSmqdKHhQXV3baMCzrT3pPVXTOTyeEB6XUCgnGOruk2j9egqYk6S9Op12g4805gjWohwoI6t3VfWoix+NTbaDicJIPGpWAEXo3rhLMZPOr7aCAb18/TDbjynsjz6AFriCWGLqICUM29sva7MB/cUef7exj+ID3tRhesbn4iIrqzNqwNUrdJjA+NT6RdQupMrcW2F464myWavLloeoTlK7z9243GEljo53fac+nvE48mFNwvf64FdBbLWO6bsiN8Qh8Npn7TQGCde2UkgBLrVyHXHsmAxeG851QG4z3MWEoUpOkVEA5nvSATr8lwnRD1sKSuEATAN6+e+fvXSg0x+BVtvQfz/A7+cRX5+yNQICBwNMCBqq8sD9vVZmAIuOO+cpRU2sQcnilHsbSzWNVTeE/TNwe5jd83PWgMUm4PGU+IdmqSpeGRzH6IQVX9G+2VjG1H16gr2RjtCbSOjr69QRFqzGYYIde4198CDzyA4eQ1yKqPXu2E2Ap7fzjrmAjuAfMZNqsxjhhOmObVTPypks44lsDbvFRjKoJaRZDavo7+fBcTNoaUS5IgXqCWZUlXEMcc2/Ooj2NaIYZpFem1BnMd6Y4MCzL3LpH96SB1xyy+40rKqkRf6agqz3+IzJlKVj3jdUndwkxVNWmGZWDm9XEW1ZEWSwNq/VxSCe4LJrSZNIcUbZSgaD38sXQMHXAQFIVMVP5J7ilKALS9O/icOp9xHEfBFUdyUhm0x4MSB+zmFZn2gG/55d+oZVWs6NGPzykaQu4fgZkOb46lOt8UTPp9Zu+uM7P0yTIoSFhM2qyciynRmO7ekvKTa/OZN7RU5Hvig0fnKN9gV9dC3eNLde1jJe6oE1ImMLE8wdQgDK6uO4ZSh4KL7TD6WwG2ahhNiaw5zxGQ8BGQKHtxAWUaG4W8oHg0K2622hjRtvOHDH+zLe0XPnPDiaZ6n2IGIcXc7qrZVHyBuQ1wmROLVgCPMW4reJ5r7+TstWphitflQwvkRgYQrKKe7anvyGfzsMK37/ej65wjcms48fISf+fCgEKgSRhauOvwEpYUP+gQ3rS4L3ZUfyTqOSxfUBUxJ/xuYMZ6acFFejqfUsqw0yuOGSo0CSPYaMiRUKdRKmNRzpnCtujX7JUIYEwqSQrIuzTZrvT7W897fDZt/uw1WeaeSfPKlZ7WY9c10MV1/elspQq8LoQAJJJbMXT5mtQfCyrf5UDNciLYJ5fgcgqXDVO9m77dG6HAQLrQT8tDcvyPelrFXo8rz5KP/uJuJY5VlecYSPx7TjJHIMGdJBq0Nb3zw5NgU8cmMpIs0d9Bh4ygVYh5w+GeKPPUiKipuFqK/r/vhRKwV4pwtds1XpKpBpIlUnop6RYfUVhMZA51jxheXJdompBy7EZvAP4HMlCzNqnug1p//emvVhjx1tX0MFCVuexNYKyUTHpAmdu5Xcr8if0cM2f07D9pL+4zqz4EA5wgeqYW2vmzNz9TLYXwpo8XfgiWHUxnaEWm6C3yyu5T8yZuz13P3KgEcNF6U8wvwGNXz+L3Qouapx5XgYMn1P22vDqwsFYFg0Zw+M7P0bqYQNSEhkiBL4DFT2H9eR0c/TmlceYS87wyc0q1AOdvmZUvyaR8od14nEBa1ZwTyMQWvrfR2S0a+7YqyL8IrMt8Pz2AsIu1+62Crt8tAtJhR4lAomlaepH8svrw7Zahi2MSPoNwSaoyqFPg1GEK6fT8oDN1KoT1CXgkBr7LK58MW3adVSPC3loP8KtaukKGK5v/o/wUi8MkdrRR4x8H6T6wsmiafty6FnYaH0D+hpV2Amvi1ElSEfnvgunYecyohK186Jrr29Uivmli8loGN4KrjoucGEoFkGmi3R1InqAsMCEqDjXxHlV2kIz9ozt9+E7LZ29lLX4JQrmZXiSyn1Q7teYgPK+ozSdJ4ZcDigyINJe9+Va6ThvTe6k0rzlqGBEjycaGTe9KiAVz7j9dZ68vnVuAoNqdWHPlh4KQ41rPYjOiE6Hy4DScfUFTFMlHRR9H+tCy6O1VcsyQL6pC/jq6yWiQh1wN1zLp+CDAcniyzUMCCmuBZc7JDB4ESeJQ1qcrcv3JLuIocJEt6pvVpUUQWUIaJp2TZwaEo9EZE+dq5VzSWAOqTc9LBdoCQ5HBDDLnT8F/GDaL0/1A8Jd+w/V7c/4KgGkQ+UKwYAYU74Tl+qAiZFqFYQtJlKf5E4W0VSDO6ENZcQAAAAzrt++V15JyAXRJrX4lJ55JWjXH2/v6I3vb06hHBQbCP+KFp17yHyuefw64BBYh4o2x4x6xqIpbaMNF0Ud9fIvPEquX4J6PKiPLhz5nSsySXA80K1Qfhl7DGcYb480RLdlMLLA/DEVAaz3yBBQUfD3H45O6R0QBQ6k4M3qjFWlNiuHH+Y1Q1laSxQ7udXJvAyfYeUhhN71zGip4SylrZSZL40zbKk7JmSFrgHHOlDKqnMi5GEsD7ApQnloJ9nLg0mnFEhjVDwViTyZ6OT7T9OFJaOLMpR9JOd5/QOZHKoHCdOH72+Q18jst8LWj+aSxL6D8V9zlIzxGG8wkTFK0hwBtq43oWQzqb+rsp2UeohmzJfLprcyCY1creepjruErmHi8M5fFbh0vcBqF5m7KDt3fcynbWe3XKhQZV1zGzncfKtVvuB7JMaTzL8ymSQ7PD1vtJB/7q6MhtpP8pQ9NIPDTxVhi4bd4Uw3pl1FXZHL9VNTSG4VkzBi0z+gc5rphI0wNurpMHSN4YLjv6EVQwzXBUPB/B36uG3UkrJhfpYViXRzM3FVShV5Ku5Mg17VyLL0HiURId8Jg9BckmvjG5Nsjd+XVEwhgC8OTdJJJHS8fCyDCvj/a1XxjCuRX+6w6bO7nRPa54KWDK3LTSWHoraEqOJGHu1UiarXX4CNivQwXz0URstPtqQTEQPBhhHDYuXob3xWDwESAM0e5wZvEAu4BuzLGR8PKiCe2IULUrFNpBENs36uouT+gdNS/1X89p0RnWOam7zvtvSJHiuAB5oAAD5ilAgudQP1nYxECWWDZs7OADKPYPGsx6TkF+6YWvY6l/H7Zk+l4TvbU26vq2TtfK4sqNrcPyouT2OOh6pD/1N6+FryM6vm4YgK3U04KWj6ACglUXgvAAc5ElfN3sSXVe64SanRRAX4+KfHkBP/UeMPONIM1LpeMOKx8qnY+EzEtKSWWbh9whhn0lK2z8679x89fl+Z4F3tz9GySe1PvCxJfpJ/0DQXp7nDUAnpQAAAAAA==";
 
@@ -408,65 +405,35 @@ const ROLES = {
   CITIZEN:            { label:"Citizen",                 level:1,  color:"gray",   stars:0,  icon:"👤" },
 };
 
-const DOJ_ROLES = [
-  "ADMIN","DOJ_CHIEF","DEPUTY_CHIEF",
-  "GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE",
-  "BAR_HEAD","BAR_SUPERVISOR","BAR_MEMBER",
-  "HEAD_LAWYER","SENIOR_LAWYER","LAWYER","TRAINEE",
-];
-
 const PERMS = {
-  DASHBOARD_VIEW:   [...DOJ_ROLES],
-
-  CASE_VIEW:        [...DOJ_ROLES],
+  CASE_VIEW:        ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER","TRAINEE"],
   CASE_CREATE:      ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   CASE_EDIT:        ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","HEAD_LAWYER","SENIOR_LAWYER"],
   CASE_CLOSE:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
   CASE_DELETE:      ["ADMIN","DOJ_CHIEF"],
-
-  DOC_VIEW:         [...DOJ_ROLES],
-  DOC_UPLOAD:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
-  DOC_DELETE:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
-
-  EVIDENCE_VIEW:    [...DOJ_ROLES],
+  EVIDENCE_VIEW:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER","TRAINEE"],
   EVIDENCE_UPLOAD:  ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   EVIDENCE_VERIFY:  ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE"],
   EVIDENCE_DELETE:  ["ADMIN","DOJ_CHIEF"],
-
-  CRIMINAL_VIEW:    [...DOJ_ROLES],
-  CRIMINAL_EDIT:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
-
-  CITIZEN_VIEW:     [...DOJ_ROLES],
-
-  CASE_FOLDER_VIEW: [...DOJ_ROLES],
-
-  LEGAL_DOC_VIEW:   [...DOJ_ROLES],
-
-  PLEA_VIEW:        [...DOJ_ROLES],
-  PLEA_MANAGE:      ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
-
   WARRANT_VIEW:     ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   WARRANT_REQUEST:  ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   WARRANT_ISSUE:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
   WARRANT_EXECUTE:  ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
-
   USER_VIEW:        ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
   USER_MANAGE:      ["ADMIN","DOJ_CHIEF"],
   ROLE_ASSIGN:      ["ADMIN"],
-
   BAR_VIEW:         ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR","BAR_MEMBER","HEAD_LAWYER","SENIOR_LAWYER","LAWYER","TRAINEE"],
   BAR_MANAGE:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR"],
   BAR_LICENSE:      ["ADMIN","DOJ_CHIEF","BAR_HEAD"],
   BAR_DISCIPLINE:   ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","BAR_HEAD","BAR_SUPERVISOR"],
-
   COURT_VIEW:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
   COURT_SCHEDULE:   ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE"],
   RULING_ISSUE:     ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
-
   ADMIN_PANEL:      ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
   AUDIT_VIEW:       ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
   SYSTEM_CONFIG:    ["ADMIN"],
-
+  CRIMINAL_VIEW:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","HEAD_LAWYER","SENIOR_LAWYER","LAWYER"],
+  CRIMINAL_EDIT:    ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"],
   JUDGE_ACCESS:     ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
   JUDGE_RULING:     ["GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
   JUDGE_LOCK_CASE:  ["GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
@@ -478,8 +445,6 @@ const PERMS = {
   JUDGE_SENIOR:     ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE"],
   JUDGE_AUDIT_VIEW: ["ADMIN","DOJ_CHIEF","DEPUTY_CHIEF","GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE"],
 };
-
-const isDOJRole = (role) => DOJ_ROLES.includes(role);
 
 const hasPerm = (role, perm) => (PERMS[perm] || []).includes(role);
 const canDo = (role, minLevel) => (ROLES[role]?.level || 0) >= minLevel;
@@ -564,41 +529,36 @@ const resolveDiscordRole = (discordRoles = []) => {
   return null; // null = not an authorized DOJ role (access denied)
 };
 
-// ZERO-TRUST DISCORD SERVER GATEWAY — Server ID: 1227422529656983582
 const verifyServerMembership = (discordUsername) => {
   const key = discordUsername.trim();
-
-  // ── GATE 1: Username must exist in server member registry ────────────────
   const memberKey = Object.keys(DOJ_SERVER_MEMBERS).find(
     k => k.toLowerCase() === key.toLowerCase()
   );
+
   if (!memberKey) return {
     authorized: false,
-    reason: `"${key}" is not a member of DOJ Discord server ${DOJ_DISCORD_SERVER_ID}. Only verified server members may access this platform.`,
+    reason: `"${key}" is not a member of the DOJ Discord server (ID: ${DOJ_DISCORD_SERVER_ID}). Only verified server members can access this platform.`,
     code: "NOT_IN_SERVER"
   };
 
   const member = DOJ_SERVER_MEMBERS[memberKey];
 
-  // ── GATE 2: serverId must exactly match 1227422529656983582 ───────────────
   if (member.serverId !== DOJ_DISCORD_SERVER_ID) return {
     authorized: false,
-    reason: `Server ID mismatch for "${memberKey}". Expected ${DOJ_DISCORD_SERVER_ID}.`,
+    reason: "Server ID mismatch. This account is not verified for the DOJ server.",
     code: "SERVER_MISMATCH"
   };
 
-  // ── GATE 3: serverMember must be explicitly true (blocks kicked/banned) ──
   if (!member.serverMember) return {
     authorized: false,
-    reason: `"${memberKey}" has been removed from the DOJ Discord server. Access permanently revoked.`,
+    reason: `"${memberKey}" has been removed from the DOJ Discord server and cannot access the platform.`,
     code: "MEMBER_REMOVED"
   };
 
-  // ── GATE 4: Must have at least one recognized DOJ role ────────────────────
   const resolvedRole = resolveDiscordRole(member.roles || []);
   if (!resolvedRole) return {
     authorized: false,
-    reason: `"${memberKey}" has no authorized DOJ role in server ${DOJ_DISCORD_SERVER_ID}. Contact an administrator.`,
+    reason: `"${memberKey}" is in the server but has no authorized DOJ role. Contact an administrator to assign your role.`,
     code: "NO_DOJ_ROLE"
   };
 
@@ -607,7 +567,6 @@ const verifyServerMembership = (discordUsername) => {
     memberKey,
     member,
     resolvedRole,
-    discordRoles: member.roles || [],
     serverId: DOJ_DISCORD_SERVER_ID,
     serverName: DOJ_DISCORD_SERVER_NAME,
   };
@@ -888,81 +847,40 @@ const riskBadge = r => (
 
 const NAV_ITEMS = [
   { section:"CORE OPERATIONS" },
-  { key:"dashboard",    label:"Dashboard",           icon:"home",       perm:"DASHBOARD_VIEW" },
-  { key:"cases",        label:"Cases",               icon:"briefcase",  perm:"CASE_VIEW",        minLevel:2 },
-  { key:"documents",    label:"Documents",           icon:"file",       perm:"DOC_VIEW",         minLevel:2 },
-  { key:"evidence",     label:"Evidence",            icon:"fingerprint",perm:"EVIDENCE_VIEW",    minLevel:2 },
+  { key:"dashboard",   label:"Dashboard",         icon:"home" },
+  { key:"cases",       label:"Cases",             icon:"briefcase" },
+  { key:"documents",   label:"Documents",         icon:"file" },
+  { key:"evidence",    label:"Evidence",          icon:"fingerprint" },
   { section:"COURT MANAGEMENT" },
-  { key:"courts",       label:"Courts Section",      icon:"hammer",     badge:"NEW",             minLevel:2 },
-  { key:"calendar",     label:"Court Schedule",      icon:"calendar",                            minLevel:2 },
-  { key:"jury",         label:"Jury Selection",      icon:"users",                               minLevel:2 },
-  { key:"judgesection", label:"Judicial Workspace",  icon:"hammer",     badge:"⚖",              minLevel:6 },
-  { key:"precedents",   label:"Legal Precedents",    icon:"book",                                minLevel:2 },
+  { key:"courts",      label:"Courts Section",    icon:"hammer",    badge:"NEW" },
+  { key:"calendar",    label:"Court Schedule",    icon:"calendar" },
+  { key:"jury",        label:"Jury Selection",    icon:"users" },
+  { key:"judgesection", label:"Judicial Workspace", icon:"hammer", badge:"⚖", minLevel:6 },
+  { key:"precedents",  label:"Legal Precedents",  icon:"book" },
   { section:"RECORDS & PROFILES" },
-  { key:"criminal",     label:"Criminal Records",    icon:"fingerprint",perm:"CRIMINAL_VIEW",    minLevel:2 },
-  { key:"citizens",     label:"Citizen Profiles",    icon:"user",       perm:"CITIZEN_VIEW",     minLevel:2 },
-  { key:"casefolders",  label:"Case Folders",        icon:"clipboard",  perm:"CASE_FOLDER_VIEW", minLevel:2 },
-  { key:"legaldocs",    label:"Legal Documents",     icon:"file",       perm:"LEGAL_DOC_VIEW",   minLevel:2 },
-  { key:"pleadeals",    label:"Plea Deals",          icon:"scale",      perm:"PLEA_VIEW",        minLevel:2 },
+  { key:"criminal",    label:"Criminal Records",  icon:"fingerprint" },
+  { key:"citizens",    label:"Citizen Profiles",  icon:"user" },
+  { key:"casefolders", label:"Case Folders",      icon:"clipboard" },
+  { key:"legaldocs",   label:"Legal Documents",   icon:"file" },
+  { key:"pleadeals",   label:"Plea Deals",        icon:"scale" },
   { section:"WARRANT SYSTEMS" },
-  { key:"warrants",     label:"Warrant System",      icon:"shield",     perm:"WARRANT_VIEW",     minLevel:2 },
-  { key:"bench",        label:"Bench Warrants",      icon:"hammer",                              minLevel:2 },
+  { key:"warrants",    label:"Warrant System",    icon:"shield" },
+  { key:"bench",       label:"Bench Warrants",    icon:"hammer" },
   { section:"OPERATIONS" },
-  { key:"roster",       label:"Staff Roster",        icon:"users",      badge:"MGT",             minLevel:4 },
-  { key:"points",       label:"Points & Fines",      icon:"star",       badge:"NEW",             minLevel:4 },
-  { key:"inmates",      label:"Detention Registry",  icon:"lock",                                minLevel:2 },
-  { key:"analytics",    label:"Analytics",           icon:"chart",                               minLevel:2 },
-  { key:"chat",         label:"Internal Comms",      icon:"chat",                                minLevel:2 },
-  { key:"bar",          label:"Bar Association",     icon:"star",       perm:"BAR_VIEW",         minLevel:2 },
-  { key:"leaderboard",  label:"Leaderboard",         icon:"star",       badge:"TOP",             minLevel:2 },
-  { key:"bausermgmt",   label:"BA User Mgmt",        icon:"users",      badge:"BA",              minLevel:6 },
+  { key:"roster",      label:"Staff Roster",      icon:"users",     badge:"MGT", minLevel:4 },
+  { key:"points",      label:"Points & Fines",    icon:"star",      badge:"NEW", minLevel:4 },
+  { key:"inmates",     label:"Detention Registry",icon:"lock" },
+  { key:"analytics",   label:"Analytics",         icon:"chart" },
+  { key:"chat",        label:"Internal Comms",    icon:"chat" },
+  { key:"bar",         label:"Bar Association",   icon:"star" },
+  { key:"leaderboard",  label:"Leaderboard",        icon:"star",      badge:"TOP", minLevel:4 },
+  { key:"bausermgmt",   label:"BA User Mgmt",        icon:"users",     badge:"BA",  minLevel:6 },
   { section:"SYSTEM" },
-  { key:"auditreport",  label:"Audit & Security",    icon:"shield",     badge:"LIVE",            minLevel:7 },
-  { key:"admin",        label:"Admin Panel",         icon:"settings",                            minLevel:8 },
-  { key:"profile",      label:"My Profile",          icon:"user" },
-  { key:"public",       label:"Public Lookup",       icon:"globe" },
+  { key:"auditreport", label:"Audit & Security",  icon:"shield",    badge:"LIVE", minLevel:7 },
+  { key:"admin",       label:"Admin Panel",       icon:"settings",  minLevel:8 },
+  { key:"profile",     label:"My Profile",        icon:"user" },
+  { key:"public",      label:"Public Lookup",     icon:"globe" },
 ];
-
-const AccessDeniedPage = ({ user, page = "this section", setAuditLog }) => {
-  useEffect(() => {
-    if (!user || !setAuditLog) return;
-    setAuditLog(prev => [{
-      id: "AUD-AD-" + Date.now(),
-      ts: new Date().toISOString(),
-      actor: user.username || "UNKNOWN",
-      action: "ACCESS_DENIED",
-      ref: page,
-      detail: `Access denied: ${user.username} (role: ${user.role || "NONE"}) attempted to access "${page}". Required: DOJ personnel role (TRAINEE or above). Server enforcement: 1227422529656983582. Not a DOJ role — all privileges blocked.`,
-      type: "auth",
-      severity: "HIGH",
-      ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
-    }, ...prev.slice(0, 499)]);
-  }, [page]);
-
-  const ts = new Date().toISOString().slice(0,19) + "Z";
-  return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"60vh",gap:18,padding:40}}>
-      <div style={{fontSize:60,filter:"grayscale(1)",opacity:.7}}>🔒</div>
-      <div style={{fontWeight:800,fontSize:22,color:"var(--teal-l)",letterSpacing:"2px",textTransform:"uppercase"}}>Access Restricted</div>
-      <div style={{color:"var(--mid)",fontSize:13,textAlign:"center",maxWidth:460,lineHeight:1.9}}>
-        <strong style={{color:"var(--gold-l)"}}>{page}</strong> is restricted to verified Department of Justice personnel only.<br/>
-        Your current role (<strong style={{color:"var(--dim)"}}>{ROLES[user?.role]?.label||user?.role||"Unknown"}</strong>)
-        does not have the required permissions. This access attempt has been logged.
-      </div>
-      <div style={{display:"flex",gap:8,marginTop:4,flexWrap:"wrap",justifyContent:"center"}}>
-        <div style={{fontSize:11,padding:"4px 14px",borderRadius:3,background:"rgba(26,122,122,.1)",border:"1px solid rgba(26,122,122,.25)",color:"var(--teal-l)",fontFamily:"'IBM Plex Mono',monospace"}}>
-          REQUIRED: DOJ PERSONNEL ROLE (TRAINEE+)
-        </div>
-        <div style={{fontSize:11,padding:"4px 14px",borderRadius:3,background:"rgba(224,122,110,.1)",border:"1px solid rgba(224,122,110,.3)",color:"var(--red)",fontFamily:"'IBM Plex Mono',monospace"}}>
-          ACCESS_DENIED — LOGGED
-        </div>
-      </div>
-      <div style={{fontSize:10,color:"var(--dim)",marginTop:8,fontFamily:"'IBM Plex Mono',monospace",letterSpacing:".5px",textAlign:"center"}}>
-        ERR_ACCESS_DENIED · ROLE:{user?.role||"NONE"} · {ts} · SERVER:1227422529656983582
-      </div>
-    </div>
-  );
-};
 
 const Sidebar = ({ page, setPage, collapsed, setCollapsed, user, onLogout }) => (
   <div className={`sidebar${collapsed ? " collapsed" : ""}`}>
@@ -979,7 +897,6 @@ const Sidebar = ({ page, setPage, collapsed, setCollapsed, user, onLogout }) => 
       {NAV_ITEMS.map((item, idx) => {
         if (item.section) return <div key={idx} className="sec-label">{item.section}</div>;
         if (item.minLevel && (ROLES[user?.role]?.level||0) < item.minLevel) return null;
-        if (item.perm && !hasPerm(user?.role, item.perm)) return null;
         const active = page === item.key;
         return (
           <div key={item.key} className={`sl${active ? " active" : ""}`} onClick={() => setPage(item.key)} title={collapsed ? item.label : ""}>
@@ -1374,17 +1291,6 @@ const Dashboard = ({ user, cases, evidence, warrants, feed, setPage }) => {
 };
 
 const CasesPage = ({ user, cases, setCases, evidence: sharedEvidence, setEvidence: setSharedEvidence, warrants: sharedWarrants, setWarrants: setSharedWarrants, onAdd, onAddEvidence, onAddWarrant, setAuditLog }) => {
-  if (!hasPerm(user?.role, "CASE_VIEW")) return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
-    <div style={{fontSize:48}}>🔒</div>
-    <div style={{fontWeight:700,fontSize:18,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
-    <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:380,lineHeight:1.7}}>
-      This section is restricted to verified Department of Justice personnel only.<br/>
-      Your current role (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role}</strong>) does not have the required permissions.
-    </div>
-    <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 16px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
-      ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
-    </div>
-  </div>);
   const [filter, setFilter] = useState("ALL");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
@@ -2178,17 +2084,6 @@ const CasesPage = ({ user, cases, setCases, evidence: sharedEvidence, setEvidenc
 };
 
 const EvidencePage = ({ user, evidence: evidenceProp, setEvidence: setEvidenceProp, onAdd, setAuditLog }) => {
-  if (!hasPerm(user?.role, "EVIDENCE_VIEW")) return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
-    <div style={{fontSize:48}}>🔒</div>
-    <div style={{fontWeight:700,fontSize:18,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
-    <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:380,lineHeight:1.7}}>
-      This section is restricted to verified Department of Justice personnel only.<br/>
-      Your current role (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role}</strong>) does not have the required permissions.
-    </div>
-    <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 16px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
-      ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
-    </div>
-  </div>);
   const [localEvidence, setLocalEvidence] = useState(INIT_EVIDENCE);
   const evidence = evidenceProp || localEvidence;
   const setEvidence = setEvidenceProp || setLocalEvidence;
@@ -2747,7 +2642,7 @@ const ChatPage = ({ user }) => {
 
 const CriminalRecordsPage = ({ user }) => {
   const [search, setSearch] = useState("");
-  const canView = hasPerm(user?.role, "CRIMINAL_VIEW");
+  const canView = canDo(user.role, 4);
   if (!canView) return <div className="alrt alrt-red">Access denied. Criminal records require Lawyer authority or higher.</div>;
 
   const records = CRIMINAL_RECORDS.filter(r => !search || r.name.toLowerCase().includes(search.toLowerCase()) || r.id.toLowerCase().includes(search.toLowerCase()));
@@ -2801,23 +2696,10 @@ const CriminalRecordsPage = ({ user }) => {
 };
 
 const PleaDealsPage = ({ user }) => {
-  if (!hasPerm(user?.role, "PLEA_VIEW")) return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:360,gap:16,padding:32}}>
-      <div style={{fontSize:52}}>🔒</div>
-      <div style={{fontWeight:700,fontSize:20,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
-      <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:400,lineHeight:1.8}}>
-        This section is restricted to verified DOJ personnel only. Your role
-        (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role||"None"}</strong>) does not have the required permissions.
-      </div>
-      <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 18px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
-        ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
-      </div>
-    </div>
-  );
   const [deals, setDeals] = useState(PLEA_DEALS);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ caseId:"", defendant:"", originalCharge:"", proposedCharge:"", sentence:"" });
-  const canCreate = hasPerm(user?.role, "PLEA_MANAGE");
+  const canCreate = canDo(user.role, 4);
 
   const addDeal = () => {
     if (!form.defendant) return;
@@ -3476,19 +3358,6 @@ const SimplePage = ({ title, sub, children }) => (
 const INIT_DOCUMENTS = []; // Cleared 2026-03-05T20:00:00.000Z — 5 AI/demo entries removed by admin cleanup
 
 const DocumentsPage = ({ user, allUsers, cases, auditLog, setAuditLog, audit }) => {
-  if (!hasPerm(user?.role, "DOC_VIEW")) return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:360,gap:16,padding:32}}>
-      <div style={{fontSize:52}}>🔒</div>
-      <div style={{fontWeight:700,fontSize:20,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
-      <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:400,lineHeight:1.8}}>
-        This section is restricted to verified DOJ personnel only. Your role
-        (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role||"None"}</strong>) does not have the required permissions.
-      </div>
-      <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 18px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
-        ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
-      </div>
-    </div>
-  );
   const [docs, setDocs] = useState(INIT_DOCUMENTS);
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
@@ -4922,19 +4791,7 @@ const PrecedentsPage = () => (
   </SimplePage>
 );
 
-const CitizensPage = ({ user }) => {
-  if (!hasPerm(user?.role, "CITIZEN_VIEW")) return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
-    <div style={{fontSize:48}}>🔒</div>
-    <div style={{fontWeight:700,fontSize:18,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
-    <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:380,lineHeight:1.7}}>
-      This section is restricted to verified Department of Justice personnel only.<br/>
-      Your current role (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role}</strong>) does not have the required permissions.
-    </div>
-    <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 16px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
-      ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
-    </div>
-  </div>);
-  return (
+const CitizensPage = () => (
   <SimplePage title="Citizen Profiles" sub="Population registry and identity management">
     <div className="card" style={{ overflowX:"auto" }}>
       <table className="tbl">
@@ -4959,24 +4816,9 @@ const CitizensPage = ({ user }) => {
       </table>
     </div>
   </SimplePage>
-  );
-};
+);
 
-const CaseFoldersPage = ({ user, cases }) => {
-  if (!hasPerm(user?.role, "CASE_FOLDER_VIEW")) return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:360,gap:16,padding:32}}>
-      <div style={{fontSize:52}}>🔒</div>
-      <div style={{fontWeight:700,fontSize:20,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
-      <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:400,lineHeight:1.8}}>
-        This section is restricted to verified DOJ personnel only. Your role
-        (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role||"None"}</strong>) does not have the required permissions.
-      </div>
-      <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 18px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
-        ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
-      </div>
-    </div>
-  );
-  return (
+const CaseFoldersPage = ({ cases }) => (
   <SimplePage title="Case Folders" sub="Organized case file storage and retrieval">
     <div className="g3" style={{ gap:13 }}>
       {cases.map(c=>(
@@ -4992,30 +4834,14 @@ const CaseFoldersPage = ({ user, cases }) => {
       ))}
     </div>
   </SimplePage>
-)
-};
+);
 
-const LegalDocsPage = ({ user }) => {
-  if (!hasPerm(user?.role, "LEGAL_DOC_VIEW")) return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:360,gap:16,padding:32}}>
-      <div style={{fontSize:52}}>🔒</div>
-      <div style={{fontWeight:700,fontSize:20,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
-      <div style={{color:"var(--dim)",fontSize:13,textAlign:"center",maxWidth:400,lineHeight:1.8}}>
-        This section is restricted to verified DOJ personnel only. Your role
-        (<strong style={{color:"var(--gold-l)"}}>{ROLES[user?.role]?.label||user?.role||"None"}</strong>) does not have the required permissions.
-      </div>
-      <div style={{fontSize:11,color:"var(--dim)",background:"var(--surf)",border:"1px solid var(--b1)",padding:"8px 18px",borderRadius:"var(--radius)",fontFamily:"'IBM Plex Mono',monospace"}}>
-        ERR_ACCESS_DENIED · {user?.role||"UNAUTHENTICATED"} · {new Date().toISOString().slice(0,19)}Z
-      </div>
-    </div>
-  );
-  return (
+const LegalDocsPage = () => (
   <SimplePage title="Legal Documents" sub="Official legal filings and government documents">
     <div className="alrt alrt-teal" style={{ marginBottom:14 }}>All documents are cryptographically signed and immutable once filed.</div>
     <DocumentsPage user={{role:"ADMIN"}}/>
   </SimplePage>
-)
-};
+);
 
 const AuthScreen = ({ onLogin }) => {
   const [mode, setMode] = useState("login");
@@ -5043,20 +4869,8 @@ const AuthScreen = ({ onLogin }) => {
         setError(u && !u.active ? "Account suspended. Contact your administrator." : "Invalid credentials.");
         setLoading(false); return;
       }
-      if (u.username !== "admin") {
-        const serverCheck = verifyServerMembership(u.username);
-        if (!serverCheck.authorized) {
-          setError("Access denied: " + serverCheck.reason);
-          setLoading(false); return;
-        }
-        if (serverCheck.resolvedRole && serverCheck.resolvedRole !== u.role) {
-          u.role = serverCheck.resolvedRole;
-        }
-      }
       sessionStorage.removeItem("login_attempts_"+username);
-      const loginTs = new Date().toISOString();
-      const sessionUser = { ...u, token:mkToken(u), sessionStart:loginTs, loginIp:"10.0."+Math.floor(Math.random()*3+1)+"."+Math.floor(Math.random()*200+10), sessionId:"SID-"+Date.now(), authMethod:"standard" };
-      onLogin(sessionUser);
+      onLogin({ ...u, token:mkToken(u), sessionStart:new Date().toISOString(), loginIp:"10.0."+Math.floor(Math.random()*3+1)+"."+Math.floor(Math.random()*200+10) });
       setLoading(false);
     }, 600);
   };
@@ -5067,16 +4881,10 @@ const AuthScreen = ({ onLogin }) => {
     if (users.find(u => u.username === username)) { setError("Username already taken."); return; }
     setLoading(true);
     setTimeout(() => {
-      const regCheck = verifyServerMembership(username);
-      if (!regCheck.authorized && username !== "admin") {
-        setError("Registration denied: " + regCheck.reason + " Only verified members of DOJ Discord server " + DOJ_DISCORD_SERVER_ID + " may register.");
-        setLoading(false); return;
-      }
-      const assignedRole = regCheck.authorized ? regCheck.resolvedRole : regRole;
-      const nu = { id:`USR-${String(users.length+1).padStart(3,"0")}`, username, password, role:assignedRole, email, discordId:username, active:true, joined:new Date().toISOString().slice(0,10), phone:"", bio:"" };
+      const nu = { id:`USR-${String(users.length+1).padStart(3,"0")}`, username, password, role:regRole, email, discordId:null, active:true, joined:new Date().toISOString().slice(0,10), phone:"", bio:"" };
       setUsers(p => [...p, nu]);
       setMode("login"); setError(""); setLoading(false);
-      toast("Account created — Discord server membership verified","success");
+      toast("Account created — you may now log in","success");
     }, 500);
   };
 
@@ -5181,34 +4989,6 @@ const AuthScreen = ({ onLogin }) => {
       revokeOnLogout:    true,
     };
 
-    if (typeof setAuditLog === "function") {
-      const auditTs = new Date().toISOString();
-      setAuditLog(prev => [
-        {
-          id: "AUD-DL-" + Date.now(),
-          ts: auditTs,
-          actor: memberKey,
-          action: "DISCORD_LOGIN",
-          ref: sessionUser.sessionId,
-          detail: `Discord login: ${memberKey} authenticated via server ${DOJ_DISCORD_SERVER_ID}. All 4 membership gates passed. Session ${sessionUser.sessionId} created.`,
-          type: "auth",
-          severity: "HIGH",
-          ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
-        },
-        {
-          id: "AUD-RA-" + (Date.now() + 1),
-          ts: auditTs,
-          actor: "SYSTEM (Discord Sync)",
-          action: "ROLE_ASSIGNED",
-          ref: memberKey,
-          detail: `Role auto-assigned from Discord server ${DOJ_DISCORD_SERVER_ID}: Discord roles [${(recheck.discordRoles || []).join(", ")}] → Platform role: ${resolvedRole}. Assignment is immutable until Discord role changes.`,
-          type: "auth",
-          severity: "HIGH",
-          ip: "10.0.0.1",
-        },
-        ...prev.slice(0, 498),
-      ]);
-    }
     toast("✓ Server verified — Welcome, " + (account.charName || memberKey), "success");
     onLogin({ ...sessionUser, token: mkToken(sessionUser) });
     setDiscordModal(false);
@@ -7478,7 +7258,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default function App() {
+function App() {
   const [user, setUser] = useState(null);
   const [showPublic, setShowPublic] = useState(false);
   const [page, setPage] = useState("dashboard");
@@ -7533,41 +7313,6 @@ export default function App() {
     window.addEventListener("keydown", reset);
     return () => { clearTimeout(timer); window.removeEventListener("click", reset); window.removeEventListener("keydown", reset); };
   }, [user?.username]);
-
-  useEffect(() => {
-    if (!user || user.authMethod !== "discord_server_verified") return;
-    const memberKey = user.discordMemberKey || user.username;
-    const check = verifyServerMembership(memberKey);
-    if (!check.authorized) {
-      const ts = new Date().toISOString();
-      setAuditLog(prev => [{
-        id: "AUD-RS-" + Date.now(), ts,
-        actor: "SYSTEM (Discord Sync)",
-        action: "ACCESS_REVOKED_MEMBERSHIP_LOST",
-        ref: memberKey,
-        detail: `Auto-revocation: ${memberKey} failed server membership check (${check.code}). Session terminated. Reason: ${check.reason}`,
-        type: "auth", severity: "CRITICAL",
-        ip: "10.0.0.1",
-      }, ...prev.slice(0, 499)]);
-      setUser(null);
-      toast("Access revoked: " + check.reason, "error");
-      return;
-    }
-    if (check.resolvedRole && check.resolvedRole !== user.role) {
-      const ts = new Date().toISOString();
-      setAuditLog(prev => [{
-        id: "AUD-RS-" + Date.now(), ts,
-        actor: "SYSTEM (Discord Sync)",
-        action: "ROLE_ASSIGNED",
-        ref: memberKey,
-        detail: `Dynamic role sync: ${memberKey} role updated ${user.role} → ${check.resolvedRole} from server ${DOJ_DISCORD_SERVER_ID}. Discord roles: [${(check.discordRoles || []).join(", ")}].`,
-        type: "auth", severity: "HIGH",
-        ip: "10.0.0.1",
-      }, ...prev.slice(0, 499)]);
-      setUser(prev => ({ ...prev, role: check.resolvedRole, discordRoles: check.discordRoles || prev.discordRoles }));
-      toast("Role updated from Discord: " + check.resolvedRole, "info");
-    }
-  }, [user?.discordMemberKey, user?.username]);
 
   useEffect(() => {
     if (!user || user.authMethod !== "discord_server_verified") return;
@@ -7650,19 +7395,19 @@ export default function App() {
 
   const renderPage = () => {
     switch (page) {
-      case "dashboard":    if (!isDOJRole(user?.role)) return <AccessDeniedPage user={user} page="Dashboard" setAuditLog={setAuditLog}/>; return <Dashboard user={user} cases={cases} evidence={evidence} warrants={warrants} feed={feed} setPage={setPage}/>;
-      case "cases":        if (!hasPerm(user?.role,"CASE_VIEW"))        return <AccessDeniedPage user={user} page="Cases" setAuditLog={setAuditLog}/>; return <CasesPage user={user} cases={cases} setCases={setCases} evidence={evidence} setEvidence={setEvidence} warrants={warrants} setWarrants={setWarrants} setAuditLog={setAuditLog} onAdd={(c)=>{addToFeed("case","Case created",c.title,c.id,user.username);awardPoints(user.username,"CASE_FILE",c.title,c.id);}} onAddEvidence={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}} onAddWarrant={(w)=>{addToFeed("warrant","Warrant issued",w.type+" — "+w.subject,w.id,user.username);awardPoints(user.username,"WARRANT_ISSUE",w.subject,w.id);}}/>;
-      case "documents":    if (!hasPerm(user?.role,"DOC_VIEW"))         return <AccessDeniedPage user={user} page="Documents" setAuditLog={setAuditLog}/>; return <DocumentsPage user={user} allUsers={allUsers} cases={cases} auditLog={auditLog} setAuditLog={setAuditLog} audit={audit}/>;
-      case "evidence":     if (!hasPerm(user?.role,"EVIDENCE_VIEW"))   return <AccessDeniedPage user={user} page="Evidence" setAuditLog={setAuditLog}/>; return <EvidencePage user={user} evidence={evidence} setEvidence={setEvidence} setAuditLog={setAuditLog} onAdd={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}}/>;
+      case "dashboard":    return <Dashboard user={user} cases={cases} evidence={evidence} warrants={warrants} feed={feed} setPage={setPage}/>;
+      case "cases":        return <CasesPage user={user} cases={cases} setCases={setCases} evidence={evidence} setEvidence={setEvidence} warrants={warrants} setWarrants={setWarrants} setAuditLog={setAuditLog} onAdd={(c)=>{addToFeed("case","Case created",c.title,c.id,user.username);awardPoints(user.username,"CASE_FILE",c.title,c.id);}} onAddEvidence={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}} onAddWarrant={(w)=>{addToFeed("warrant","Warrant issued",w.type+" — "+w.subject,w.id,user.username);awardPoints(user.username,"WARRANT_ISSUE",w.subject,w.id);}}/>;
+      case "documents":    return <DocumentsPage user={user} allUsers={allUsers} cases={cases} auditLog={auditLog} setAuditLog={setAuditLog} audit={audit}/>;
+      case "evidence":     return <EvidencePage user={user} evidence={evidence} setEvidence={setEvidence} setAuditLog={setAuditLog} onAdd={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}}/>;
       case "calendar":     return <CalendarPage user={user}/>;
       case "jury":         return <JuryPage/>;
       case "judgesection": return <JudgeSectionPage user={user} allUsers={allUsers} cases={cases} setCases={setCases} auditLog={auditLog} setAuditLog={setAuditLog}/>;
       case "precedents":   return <PrecedentsPage/>;
-      case "criminal":     if (!hasPerm(user?.role,"CRIMINAL_VIEW"))   return <AccessDeniedPage user={user} page="Criminal Records" setAuditLog={setAuditLog}/>; return <CriminalRecordsPage user={user}/>;
-      case "citizens":     if (!hasPerm(user?.role,"CITIZEN_VIEW"))    return <AccessDeniedPage user={user} page="Citizen Profiles" setAuditLog={setAuditLog}/>; return <CitizensPage user={user}/>;
-      case "casefolders":  if (!hasPerm(user?.role,"CASE_FOLDER_VIEW")) return <AccessDeniedPage user={user} page="Case Folders" setAuditLog={setAuditLog}/>; return <CaseFoldersPage user={user} cases={cases}/>;
-      case "legaldocs":    if (!hasPerm(user?.role,"LEGAL_DOC_VIEW"))   return <AccessDeniedPage user={user} page="Legal Documents" setAuditLog={setAuditLog}/>; return <LegalDocsPage user={user}/>;
-      case "pleadeals":    if (!hasPerm(user?.role,"PLEA_VIEW"))        return <AccessDeniedPage user={user} page="Plea Deals" setAuditLog={setAuditLog}/>; return <PleaDealsPage user={user}/>;
+      case "criminal":     return <CriminalRecordsPage user={user}/>;
+      case "citizens":     return <CitizensPage/>;
+      case "casefolders":  return <CaseFoldersPage cases={cases}/>;
+      case "legaldocs":    return <LegalDocsPage/>;
+      case "pleadeals":    return <PleaDealsPage user={user}/>;
       case "warrants":     return <WarrantsPage user={user} type="ALL" warrants={warrants} setWarrants={setWarrants} onAdd={(w)=>{addToFeed("warrant","Warrant issued",w.type+" — "+w.subject,w.id,user.username);awardPoints(user.username,"WARRANT_ISSUE",w.subject,w.id);}}/>;
       case "bench":        return <WarrantsPage user={user} type="BENCH" warrants={warrants} setWarrants={setWarrants} onAdd={(w)=>addToFeed("warrant","Bench warrant issued",w.subject,w.id,user.username)}/>;
       case "inmates":      return <InmatesPage user={user}/>;
@@ -7691,32 +7436,11 @@ export default function App() {
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} setPage={p => { setPage(p); setSearchOpen(false); }}/>
       <div className="app-layout">
         <Sidebar page={page} setPage={setPage} collapsed={collapsed} setCollapsed={setCollapsed} user={user} onLogout={()=>{
-          const logoutTs = new Date().toISOString();
           if (user?.authMethod === "discord_server_verified") {
-            setAuditLog(prev => [{
-              id: "AUD-LO-" + Date.now(),
-              ts: logoutTs,
-              actor: user.discordMemberKey || user.username,
-              action: "DISCORD_LOGOUT",
-              ref: user.sessionId || user.id,
-              detail: `Discord session revoked. User: ${user.discordMemberKey || user.username}. Server: ${DOJ_DISCORD_SERVER_ID}. Session terminated. All platform privileges removed.`,
-              type: "auth", severity: "HIGH",
-              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
-            }, ...prev.slice(0, 499)]);
-          } else if (user) {
-            setAuditLog(prev => [{
-              id: "AUD-LO-" + Date.now(),
-              ts: logoutTs,
-              actor: user.username,
-              action: "SESSION_LOGOUT",
-              ref: user.id,
-              detail: `Session terminated: ${user.username} (${user.role}). All access revoked.`,
-              type: "auth", severity: "MEDIUM",
-              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
-            }, ...prev.slice(0, 499)]);
+            const recheck = verifyServerMembership(user.discordMemberKey || user.username);
           }
           setUser(null);
-          toast("Session terminated — all access revoked. Re-authentication required.", "warn");
+          toast("Session terminated — Discord access revoked. Re-authentication required.", "warn");
         }}/>
         <div className="main-area">
           <TopBar user={user} dark={dark} setDark={setDark} notifs={notifs} setNotifs={setNotifs} onSearch={() => setSearchOpen(true)}/>
@@ -7730,3 +7454,6 @@ export default function App() {
   );
 }
 
+
+
+export default App;
