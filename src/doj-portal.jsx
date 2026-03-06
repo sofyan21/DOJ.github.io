@@ -7694,5 +7694,36 @@ export default function App() {
               id: "AUD-LO-" + Date.now(),
               ts: logoutTs,
               actor: user.discordMemberKey || user.username,
-      
+              action: "DISCORD_LOGOUT",
+              ref: user.sessionId || user.id,
+              detail: `Discord session revoked. User: ${user.discordMemberKey || user.username}. Server: ${DOJ_DISCORD_SERVER_ID}. Session terminated. All platform privileges removed.`,
+              type: "auth", severity: "HIGH",
+              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+            }, ...prev.slice(0, 499)]);
+          } else if (user) {
+            setAuditLog(prev => [{
+              id: "AUD-LO-" + Date.now(),
+              ts: logoutTs,
+              actor: user.username,
+              action: "SESSION_LOGOUT",
+              ref: user.id,
+              detail: `Session terminated: ${user.username} (${user.role}). All access revoked.`,
+              type: "auth", severity: "MEDIUM",
+              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+            }, ...prev.slice(0, 499)]);
+          }
+          setUser(null);
+          toast("Session terminated — all access revoked. Re-authentication required.", "warn");
+        }}/>
+        <div className="main-area">
+          <TopBar user={user} dark={dark} setDark={setDark} notifs={notifs} setNotifs={setNotifs} onSearch={() => setSearchOpen(true)}/>
+          <div className="page-content">
+            {renderPage()}
+          </div>
+        </div>
+      </div>
+    </>
+    </ErrorBoundary>
+  );
+}
 
