@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.js": "/DOJ.github.io/static/js/main.4a5e632b.js",
-    "index.html": "/DOJ.github.io/index.html",
-    "main.4a5e632b.js.map": "/DOJ.github.io/static/js/main.4a5e632b.js.map"
+    "main.js": "/static/js/main.4a5e632b.js",
+    "index.html": "/index.html",
+    "main.4a5e632b.js.map": "/static/js/main.4a5e632b.js.map"
   },
   "entrypoints": [
     "static/js/main.4a5e632b.js"
