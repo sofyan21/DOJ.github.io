@@ -7548,6 +7548,7 @@ export default function App() {
   const [notifs, setNotifs] = useState(INIT_NOTIFS);
   const [searchOpen, setSearchOpen] = useState(false);
   const [auditLog, setAuditLog] = useState(typeof INIT_AUDIT_LOG !== "undefined" ? INIT_AUDIT_LOG : []);
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
 
   const [feed, setFeed] = useState([
     { id:"F1", type:"case",     label:"Case opened",            detail:"State v. Marcus L. Donovan",  ref:"CASE-2025-0041", time:"Jan 14, 09:00 AM", user:"Prosecutor" },
@@ -7739,34 +7740,7 @@ export default function App() {
       <PdfModal />
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} setPage={p => { setPage(p); setSearchOpen(false); }}/>
       <div className="app-layout">
-        <Sidebar page={page} setPage={setPage} collapsed={collapsed} setCollapsed={setCollapsed} user={user} onLogout={()=>{
-          const logoutTs = new Date().toISOString();
-          if (user?.authMethod === "discord_server_verified") {
-            setAuditLog(prev => [{
-              id: "AUD-LO-" + Date.now(),
-              ts: logoutTs,
-              actor: user.discordMemberKey || user.username,
-              action: "DISCORD_LOGOUT",
-              ref: user.sessionId || user.id,
-              detail: `Discord session revoked. User: ${user.discordMemberKey || user.username}. Server: ${DOJ_DISCORD_SERVER_ID}. Session terminated. All platform privileges removed.`,
-              type: "auth", severity: "HIGH",
-              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
-            }, ...prev.slice(0, 499)]);
-          } else if (user) {
-            setAuditLog(prev => [{
-              id: "AUD-LO-" + Date.now(),
-              ts: logoutTs,
-              actor: user.username,
-              action: "SESSION_LOGOUT",
-              ref: user.id,
-              detail: `Session terminated: ${user.username} (${user.role}). All access revoked.`,
-              type: "auth", severity: "MEDIUM",
-              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
-            }, ...prev.slice(0, 499)]);
-          }
-          setUser(null);
-          toast("Session terminated — all access revoked. Re-authentication required.", "warn");
-        }}/>
+        <Sidebar page={page} setPage={setPage} collapsed={collapsed} setCollapsed={setCollapsed} user={user} onLogout={()=>setLogoutConfirm(true)}/>
         <div className="main-area">
           <TopBar user={user} dark={dark} setDark={setDark} notifs={notifs} setNotifs={setNotifs} onSearch={() => setSearchOpen(true)}/>
           <div className="page-content">
@@ -7774,6 +7748,61 @@ export default function App() {
           </div>
         </div>
       </div>
+      {logoutConfirm && (
+        <div className="mo-ov" onClick={()=>setLogoutConfirm(false)}>
+          <div className="mo-box" style={{ maxWidth:420 }} onClick={e=>e.stopPropagation()}>
+            <div className="mo-hd">
+              <div>
+                <div style={{ fontWeight:700 }}>Sign Out</div>
+                <div className="tsm tdim">End this session and return to the login screen?</div>
+              </div>
+              <button className="btn btn-xs btn-outline" onClick={()=>setLogoutConfirm(false)}>✕</button>
+            </div>
+            <div className="mo-bd">
+              <div style={{ fontSize:12, color:"var(--mid)", lineHeight:1.6 }}>
+                Signing out will revoke your session token. You will need to re-authenticate to access the portal again.
+              </div>
+            </div>
+            <div className="mo-ft">
+              <button className="btn btn-outline" onClick={()=>setLogoutConfirm(false)}>Cancel</button>
+              <button className="btn btn-red" onClick={()=>{
+                try {
+                  const logoutTs = new Date().toISOString();
+                  if (user?.authMethod === "discord_server_verified") {
+                    setAuditLog(prev => [{
+                      id: "AUD-LO-" + Date.now(),
+                      ts: logoutTs,
+                      actor: user.discordMemberKey || user.username,
+                      action: "DISCORD_LOGOUT",
+                      ref: user.sessionId || user.id,
+                      detail: `Discord session revoked. User: ${user.discordMemberKey || user.username}. Server: ${DOJ_DISCORD_SERVER_ID}. Session terminated.`,
+                      type: "auth", severity: "HIGH",
+                      ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+                    }, ...prev.slice(0, 499)]);
+                  } else if (user) {
+                    setAuditLog(prev => [{
+                      id: "AUD-LO-" + Date.now(),
+                      ts: logoutTs,
+                      actor: user.username,
+                      action: "SESSION_LOGOUT",
+                      ref: user.id,
+                      detail: `Session terminated: ${user.username} (${user.role}). All access revoked.`,
+                      type: "auth", severity: "MEDIUM",
+                      ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+                    }, ...prev.slice(0, 499)]);
+                  }
+                } catch (err) {}
+                setLogoutConfirm(false);
+                setPage("dashboard");
+                setUser(null);
+                toast("Signed out — all access revoked.", "warn");
+              }}>
+                <Ico n="logout" s={13}/> Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <SpeedInsights />
     </>
     </ErrorBoundary>
