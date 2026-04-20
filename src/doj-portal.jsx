@@ -5512,6 +5512,7 @@ const StaffRosterPage = ({ user, allUsers, setAllUsers, auditLog, setAuditLog, p
   const [formError, setFormError] = useState("");
 
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [forceSignOutModal, setForceSignOutModal] = useState(null);
 
   const writeAudit = (action, detail, ref, severity="MEDIUM") => {
     const entry = {
@@ -5926,6 +5927,7 @@ const StaffRosterPage = ({ user, allUsers, setAllUsers, auditLog, setAuditLog, p
                           <td style={{textAlign:"center"}} onClick={e=>e.stopPropagation()}>
                             <div style={{display:"flex",gap:5,justifyContent:"center"}}>
                               <button className="btn btn-outline btn-xs" onClick={()=>openEdit(u)} title="Edit"><Ico n="edit" s={11}/></button>
+                              {canAdmin && <button className="btn btn-xs" style={{background:"rgba(234,179,8,.12)",color:"#f0c842",border:"1px solid rgba(234,179,8,.3)",fontSize:10}} onClick={()=>setForceSignOutModal(u)} title="Force Sign Out">⏻</button>}
                               {canAdmin && <button className="btn btn-xs" style={{background:"rgba(224,122,110,.12)",color:"#e07a6e",border:"1px solid rgba(224,122,110,.25)"}} onClick={()=>setConfirmDelete(u)} title="Remove">✕</button>}
                             </div>
                           </td>
@@ -6210,6 +6212,41 @@ const StaffRosterPage = ({ user, allUsers, setAllUsers, auditLog, setAuditLog, p
               <button className="btn btn-outline" onClick={()=>setShowModal(false)}>Cancel</button>
               <button className="btn btn-teal" onClick={handleSave}>
                 <Ico n={editMode?"edit":"plus"} s={13}/> {editMode?"Save Changes":"Add to Roster"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {forceSignOutModal && (
+        <div className="mo-ov">
+          <div className="mo-box" style={{maxWidth:430, border:"1px solid rgba(234,179,8,.4)"}}>
+            <div className="mo-hd" style={{background:"rgba(234,179,8,.08)"}}>
+              <div>
+                <div style={{fontWeight:700}}>⏻ Force Sign Out</div>
+                <div className="tsm tdim">Terminate active session for this user</div>
+              </div>
+              <button className="btn btn-xs btn-outline" onClick={()=>setForceSignOutModal(null)}>✕</button>
+            </div>
+            <div className="mo-bd">
+              <div className="alrt alrt-red" style={{marginBottom:12,fontSize:11}}>
+                This will immediately end the user's session. They will be redirected to the login screen and must re-authenticate.
+              </div>
+              <div style={{background:"var(--surf)",border:"1px solid var(--b1)",borderRadius:"var(--radius)",padding:"12px 14px"}}>
+                <div style={{fontWeight:700,fontSize:14}}>{forceSignOutModal.charName}</div>
+                <div className="tsm tdim">@{forceSignOutModal.username} · {ROLES[forceSignOutModal.role]?.label}</div>
+              </div>
+            </div>
+            <div className="mo-ft">
+              <button className="btn btn-outline" onClick={()=>setForceSignOutModal(null)}>Cancel</button>
+              <button className="btn" style={{background:"rgba(234,179,8,.2)",color:"#f0c842",border:"1px solid rgba(234,179,8,.4)"}} onClick={()=>{
+                localStorage.setItem("doj_force_signout_" + forceSignOutModal.username, Date.now());
+                writeAudit("FORCE_SIGNOUT", `Admin ${user.username} force-signed-out ${forceSignOutModal.username} (${forceSignOutModal.charName})`, forceSignOutModal.username, "HIGH");
+                toast(`${forceSignOutModal.charName}'s session terminated`, "warn");
+                setForceSignOutModal(null);
+              }}>
+                <Ico n="logout" s={13}/> Force Sign Out
               </button>
             </div>
           </div>
@@ -7549,6 +7586,23 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [auditLog, setAuditLog] = useState(typeof INIT_AUDIT_LOG !== "undefined" ? INIT_AUDIT_LOG : []);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const key = "doj_force_signout_" + user.username;
+    const check = () => {
+      if (localStorage.getItem(key)) {
+        localStorage.removeItem(key);
+        setPage("dashboard");
+        setUser(null);
+        toast("Your session has been terminated by an administrator.", "error");
+      }
+    };
+    check();
+    window.addEventListener("storage", check);
+    const timer = setInterval(check, 8000);
+    return () => { window.removeEventListener("storage", check); clearInterval(timer); };
+  }, [user?.username]);
 
   const [feed, setFeed] = useState([
     { id:"F1", type:"case",     label:"Case opened",            detail:"State v. Marcus L. Donovan",  ref:"CASE-2025-0041", time:"Jan 14, 09:00 AM", user:"Prosecutor" },
