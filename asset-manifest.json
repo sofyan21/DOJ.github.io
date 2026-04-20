@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/DOJ.github.io/static/js/main.2bd17006.js",
+    "main.js": "/DOJ.github.io/static/js/main.83a02bb4.js",
     "index.html": "/DOJ.github.io/index.html",
-    "main.2bd17006.js.map": "/DOJ.github.io/static/js/main.2bd17006.js.map"
+    "main.83a02bb4.js.map": "/DOJ.github.io/static/js/main.83a02bb4.js.map"
   },
   "entrypoints": [
-    "static/js/main.2bd17006.js"
+    "static/js/main.83a02bb4.js"
   ]
 }
