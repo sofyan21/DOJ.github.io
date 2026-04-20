@@ -1126,7 +1126,7 @@ const GlobalSearch = ({ open, onClose, setPage }) => {
   );
 };
 
-const Dashboard = ({ user, cases, evidence, warrants, hearings, feed, setPage }) => {
+const Dashboard = ({ user, cases, evidence, warrants, feed, setPage }) => {
   const activeCases = cases.filter(c => c.status !== "CLOSED").length;
   const closedCases = cases.filter(c => c.status === "CLOSED").length;
   const inCourt = cases.filter(c => c.status === "IN_COURT").length;
@@ -1147,7 +1147,7 @@ const Dashboard = ({ user, cases, evidence, warrants, hearings, feed, setPage })
         {[
           { label:"Active Cases",      value:activeCases, color:"teal",  icon:"briefcase", trend:"+3 this month" },
           { label:"Pending Documents", value:14,          color:"gold",  icon:"file",       trend:"⚠ 3 overdue" },
-          { label:"Court Hearings",    value:(hearings||[]).filter(h=>h.status==="SCHEDULED").length, color:"",icon:"calendar",trend:"Next: Apr 10" },
+          { label:"Court Hearings",    value:INIT_HEARINGS.filter(h=>h.status==="SCHEDULED").length, color:"",icon:"calendar",trend:"Next: Apr 10" },
           { label:"Closed Cases",      value:closedCases, color:"green", icon:"check",      trend:"82% resolution" },
         ].map(s => (
           <div key={s.label} className={`stat-card ${s.color}`}>
@@ -1241,7 +1241,7 @@ const Dashboard = ({ user, cases, evidence, warrants, hearings, feed, setPage })
           <div className="card-body">
             {[
               { label:"Active Cases",       value:activeCases,          color:"var(--teal-l)" },
-              { label:"Scheduled Hearings", value:(hearings||[]).filter(h=>h.status==="SCHEDULED").length, color:"#5aabec" },
+              { label:"Scheduled Hearings", value:INIT_HEARINGS.filter(h=>h.status==="SCHEDULED").length, color:"#5aabec" },
               { label:"Pending Documents",  value:14,                   color:"var(--gold-l)" },
               { label:"Closed Cases",       value:closedCases,          color:"#4cd98a" },
               { label:"Active Users",       value:12,                   color:"var(--mid)" },
@@ -1371,7 +1371,7 @@ const Dashboard = ({ user, cases, evidence, warrants, hearings, feed, setPage })
   );
 };
 
-const CasesPage = ({ user, cases, setCases, evidence: sharedEvidence, setEvidence: setSharedEvidence, warrants: sharedWarrants, setWarrants: setSharedWarrants, hearings, setHearings, onAdd, onAddEvidence, onAddWarrant, setAuditLog }) => {
+const CasesPage = ({ user, cases, setCases, evidence: sharedEvidence, setEvidence: setSharedEvidence, warrants: sharedWarrants, setWarrants: setSharedWarrants, onAdd, onAddEvidence, onAddWarrant, setAuditLog }) => {
   if (!hasPerm(user?.role, "CASE_VIEW")) return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:320,gap:16}}>
     <div style={{fontSize:48}}>🔒</div>
     <div style={{fontWeight:700,fontSize:18,color:"var(--teal-l)",letterSpacing:"1px"}}>ACCESS RESTRICTED</div>
@@ -1483,8 +1483,7 @@ const CasesPage = ({ user, cases, setCases, evidence: sharedEvidence, setEvidenc
 
   const addHearingToCase = () => {
     if (!hrForm.title || !hrForm.date || !lookupResult) return;
-    const newHearing = { id:"HRG-"+String((hearings||[]).length+1).padStart(3,"0"), caseId:lookupResult.id, ...hrForm, status:"SCHEDULED" };
-    setHearings(p => [...p, newHearing]);
+    INIT_HEARINGS.push({ id:"HRG-"+String(INIT_HEARINGS.length+1).padStart(3,"0"), caseId:lookupResult.id, ...hrForm, status:"SCHEDULED" });
     setCases(p=>p.map(c=>c.id===lookupResult.id?{...c,hearing:hrForm.date,history:[...c.history,{d:new Date().toISOString().slice(0,10),a:"Hearing scheduled: "+hrForm.title+" on "+hrForm.date,by:user.username}]}:c));
     setSelected(p=>p?{...p,hearing:hrForm.date}:p);
     toast("Hearing scheduled for "+lookupResult.id,"success");
@@ -1802,9 +1801,9 @@ const CasesPage = ({ user, cases, setCases, evidence: sharedEvidence, setEvidenc
                   <div className="dvd"/>
                   <div>
                     <div className="lbl">Linked Hearings</div>
-                    {(hearings||[]).filter(h=>h.caseId===selected.id).length === 0 ? (
+                    {INIT_HEARINGS.filter(h=>h.caseId===selected.id).length === 0 ? (
                       <div style={{ fontSize:13, color:"var(--dim)", padding:"8px 0" }}>No hearings scheduled for this case.</div>
-                    ) : (hearings||[]).filter(h=>h.caseId===selected.id).map(h=>(
+                    ) : INIT_HEARINGS.filter(h=>h.caseId===selected.id).map(h=>(
                       <div key={h.id} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:"var(--surf)", border:"1px solid var(--b1)", borderRadius:"var(--radius)", padding:"10px 12px", marginBottom:8 }}>
                         <div>
                           <div style={{ fontWeight:600, fontSize:13 }}>{h.title}</div>
@@ -2354,7 +2353,8 @@ const WarrantsPage = ({ user, type = "ALL", warrants: warrantsProp, setWarrants:
   );
 };
 
-const CalendarPage = ({ user, hearings, setHearings }) => {
+const CalendarPage = ({ user }) => {
+  const [hearings, setHearings] = useState(INIT_HEARINGS);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ caseId:"", title:"", date:"", time:"09:00", room:"Courtroom 1", judge:"JDG-001", type:"TRIAL" });
   const [selectedDate, setSelectedDate] = useState(null);
@@ -2375,11 +2375,6 @@ const CalendarPage = ({ user, hearings, setHearings }) => {
     if (!form.title || !form.date) return;
     setHearings(p => [...p, { id:`HRG-${String(p.length+1).padStart(3,"0")}`, ...form, status:"SCHEDULED" }]);
     toast("Hearing scheduled", "success"); setShowAdd(false);
-  };
-
-  const updateHearingStatus = (id, status) => {
-    setHearings(p => p.map(h => h.id === id ? { ...h, status } : h));
-    toast(`Hearing marked ${status.toLowerCase()}`, status === "COMPLETED" ? "success" : "warn");
   };
 
   const cells = [];
@@ -2424,9 +2419,9 @@ const CalendarPage = ({ user, hearings, setHearings }) => {
         <div className="card-header"><span style={{ fontWeight:600 }}>Upcoming Hearings</span><span className="badge bg-teal">{hearings.filter(h=>h.status==="SCHEDULED").length} Scheduled</span></div>
         <div style={{ overflowX:"auto" }}>
           <table className="tbl">
-            <thead><tr><th>ID</th><th>Title</th><th>Date &amp; Time</th><th>Courtroom</th><th>Judge</th><th>Type</th><th>Status</th>{canSchedule&&<th>Actions</th>}</tr></thead>
+            <thead><tr><th>ID</th><th>Title</th><th>Date &amp; Time</th><th>Courtroom</th><th>Judge</th><th>Type</th><th>Status</th></tr></thead>
             <tbody>
-              {(hearings||[]).map(h => (
+              {hearings.map(h => (
                 <tr key={h.id}>
                   <td className="mo txs tdim">{h.id}</td>
                   <td style={{ fontWeight:500 }}>{h.title}</td>
@@ -2435,22 +2430,8 @@ const CalendarPage = ({ user, hearings, setHearings }) => {
                   <td className="tsm tmid">{INIT_JUDGES.find(j=>j.id===h.judge)?.name||h.judge}</td>
                   <td><span className="tag">{h.type}</span></td>
                   <td>{statusBadge(h.status)}</td>
-                  {canSchedule && (
-                    <td>
-                      {h.status === "SCHEDULED" && (
-                        <div style={{ display:"flex", gap:4 }}>
-                          <button className="btn btn-xs btn-teal" onClick={()=>updateHearingStatus(h.id,"COMPLETED")}><Ico n="check" s={11}/>Complete</button>
-                          <button className="btn btn-xs btn-red" onClick={()=>updateHearingStatus(h.id,"CANCELLED")}><Ico n="x" s={11}/>Cancel</button>
-                        </div>
-                      )}
-                      {h.status !== "SCHEDULED" && <span style={{ fontSize:10, color:"var(--dim)" }}>{h.status}</span>}
-                    </td>
-                  )}
                 </tr>
               ))}
-              {(hearings||[]).length === 0 && (
-                <tr><td colSpan={canSchedule?8:7} style={{ textAlign:"center", color:"var(--dim)", padding:20 }}>No hearings scheduled</td></tr>
-              )}
             </tbody>
           </table>
         </div>
@@ -3865,7 +3846,7 @@ const JuryPage = () => (
   </SimplePage>
 );
 
-const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditLog, hearings, setHearings }) => {
+const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditLog }) => {
 
   const JUDGE_ROLES = ["GENERAL_JUDGE","SENIOR_LEAD_JUDGE","LEAD_JUDGE","JUDGE","ADMIN","DOJ_CHIEF","DEPUTY_CHIEF"];
   const isAuthorized = JUDGE_ROLES.includes(user?.role);
@@ -3884,6 +3865,7 @@ const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditL
   const [jDocs, setJDocs]          = useState(INIT_JUDICIAL_DOCS);
   const [jNotes, setJNotes]        = useState(INIT_JUDICIAL_NOTES);
   const [wRequests, setWRequests]  = useState(INIT_WARRANT_REQUESTS);
+  const [localHearings, setLocalHearings] = useState(INIT_HEARINGS);
   const [selectedCase, setSelectedCase]   = useState(null);
   const [mfaConfirmed, setMfaConfirmed]   = useState(false);
   const [mfaModal, setMfaModal]           = useState(false);
@@ -3897,7 +3879,6 @@ const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditL
   const [showReportModal, setShowReportModal]     = useState(false);
   const [showAppealModal, setShowAppealModal]     = useState(false);
   const [lockConfirmCase, setLockConfirmCase]     = useState(null);
-  const [denyModal, setDenyModal]                 = useState(null); // { reqId, reason }
   const [rulingForm, setRulingForm] = useState({ verdict:"GUILTY", sentence:"", fine:"", reasoning:"", charges:[""], appealDeadline:"" });
   const [noteForm, setNoteForm]     = useState({ note:"", classification:"CONFIDENTIAL" });
   const [docForm, setDocForm]       = useState({ name:"", type:"COURT_ORDER", classification:"CONFIDENTIAL" });
@@ -4076,7 +4057,7 @@ const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditL
       judge: judgeId, status: "SCHEDULED",
       scheduledBy: judgeId,
     };
-    setHearings(p => [h, ...p]);
+    setLocalHearings(p => [h, ...p]);
     judicialAudit("HEARING_SCHEDULED", targetCase.id,
       `Hearing scheduled: ${h.title} — ${h.date} ${h.time}, ${h.room}.`,
       "MEDIUM");
@@ -4385,7 +4366,7 @@ const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditL
               <table className="tbl">
                 <thead><tr><th>Req ID</th><th>Type</th><th>Case</th><th>Subject</th><th>Grounds</th><th>Requested By</th><th>Urgency</th><th>Status</th><th>Action</th></tr></thead>
                 <tbody>
-                  {wRequests.filter(r=>r.status==="PENDING"&&(r.assignedJudge===judgeId||seniorJudge)).map(r=>(
+                  {wRequests.filter(r=>(r.assignedJudge===judgeId||seniorJudge)).map(r=>(
                     <tr key={r.id}>
                       <td><span className="mo tsm tdim">{r.id}</span></td>
                       <td><span className={`badge bg-${r.type==="ARREST"?"red":r.type==="WIRETAP"?"gold":"blue"}`}>{r.type}</span></td>
@@ -4399,14 +4380,14 @@ const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditL
                         {r.status === "PENDING" && (
                           <div style={{ display:"flex", gap:4 }}>
                             <button className="btn btn-xs btn-teal" onClick={()=>requireMfa(()=>reviewWarrant(r.id,"APPROVED"),null)}>Approve</button>
-                            <button className="btn btn-xs" style={{ background:"rgba(224,122,110,.12)",color:"#e07a6e",border:"1px solid rgba(224,122,110,.3)",fontSize:11 }} onClick={()=>setDenyModal({ reqId:r.id, reason:"" })}>Deny</button>
+                            <button className="btn btn-xs" style={{ background:"rgba(224,122,110,.12)",color:"#e07a6e",border:"1px solid rgba(224,122,110,.3)",fontSize:11 }} onClick={()=>reviewWarrant(r.id,"DENIED")}>Deny</button>
                           </div>
                         )}
                         {r.status !== "PENDING" && <span style={{ fontSize:10, color:"var(--dim)" }}>Reviewed {r.reviewedAt?.slice(0,10)}</span>}
                       </td>
                     </tr>
                   ))}
-                  {wRequests.filter(r=>r.status==="PENDING"&&(r.assignedJudge===judgeId||seniorJudge)).length===0 && (
+                  {wRequests.filter(r=>(r.assignedJudge===judgeId||seniorJudge)).length===0 && (
                     <tr><td colSpan={9} style={{ textAlign:"center", color:"var(--dim)", padding:20 }}>No pending warrant requests</td></tr>
                   )}
                 </tbody>
@@ -4432,7 +4413,7 @@ const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditL
               <table className="tbl">
                 <thead><tr><th>ID</th><th>Title</th><th>Case</th><th>Type</th><th>Date</th><th>Time</th><th>Courtroom</th><th>Status</th></tr></thead>
                 <tbody>
-                  {(hearings||[]).filter(h => myCases.some(c=>c.id===h.caseId)).map(h=>(
+                  {localHearings.filter(h => myCases.some(c=>c.id===h.caseId)).map(h=>(
                     <tr key={h.id}>
                       <td><span className="mo tsm tdim">{h.id}</span></td>
                       <td style={{ fontWeight:600 }}>{h.title}</td>
@@ -4630,38 +4611,6 @@ const JudgeSectionPage = ({ user, allUsers, cases, setCases, auditLog, setAuditL
       )}
 
       {}
-
-      {}
-      {denyModal && (
-        <div className="mo-ov">
-          <div className="mo-box" style={{ maxWidth:460, border:"1px solid rgba(192,57,43,.5)" }}>
-            <div className="mo-hd" style={{ background:"rgba(192,57,43,.1)" }}>
-              <div>
-                <div style={{ fontWeight:700 }}>⛔ Deny Warrant Request</div>
-                <div className="tsm tdim">Provide a reason for denial — this will be recorded in the judicial audit log.</div>
-              </div>
-              <button className="btn btn-xs btn-outline" onClick={()=>setDenyModal(null)}>✕</button>
-            </div>
-            <div className="mo-bd">
-              <div className="alrt alrt-red" style={{ marginBottom:12, fontSize:11 }}>
-                Denial is irreversible. The requesting party will see this reason. Ensure the grounds are lawful and well-documented.
-              </div>
-              <div className="fg">
-                <label className="lbl">Reason for Denial *</label>
-                <textarea className="inp" rows={4} value={denyModal.reason}
-                  onChange={e=>setDenyModal(p=>({...p,reason:e.target.value}))}
-                  placeholder="e.g. Insufficient probable cause — grounds do not meet the legal threshold required for this warrant type."/>
-              </div>
-            </div>
-            <div className="mo-ft">
-              <button className="btn btn-outline" onClick={()=>setDenyModal(null)}>Cancel</button>
-              <button className="btn btn-red" disabled={!denyModal.reason.trim()} onClick={()=>{ reviewWarrant(denyModal.reqId,"DENIED",denyModal.reason); setDenyModal(null); }}>
-                <Ico n="x" s={13}/> Confirm Denial
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {}
       {mfaModal && (
@@ -5142,6 +5091,7 @@ const AuthScreen = ({ onLogin }) => {
     "sultan13579": { roles:["Head of Bar Association"],               avatar:"🏛", verified:true },
     "y3_4":        { roles:["Bar Association Supervisor"],            avatar:"📋", verified:true },
     "albsof0556":  { roles:["Bar Association Supervisor"],            avatar:"📋", verified:true },
+    "abo3th":      { roles:["Deputy of DOJ"],                         avatar:"⭐", verified:true },
     "K3Q8":        { roles:["Judge"],                                 avatar:"⚖",  verified:true },
     "o.s45":       { roles:["Senior Lawyer"],                         avatar:"⚖",  verified:true },
     "df_511":      { roles:["Senior Lawyer"],                         avatar:"⚖",  verified:true },
@@ -6280,7 +6230,7 @@ const StaffRosterPage = ({ user, allUsers, setAllUsers, auditLog, setAuditLog, p
   );
 };
 
-const CourtsPage = ({ user, hearings }) => {
+const CourtsPage = ({ user }) => {
   const [view, setView] = useState("roster");
   const canSchedule = hasPerm(user.role, "COURT_SCHEDULE");
 
@@ -6301,7 +6251,7 @@ const CourtsPage = ({ user, hearings }) => {
           { label:"Total Judges", v:INIT_JUDGES.filter(j=>j.status==="ACTIVE").length, color:"var(--teal-l)", icon:"hammer" },
           { label:"Urgent Courts", v:INIT_JUDGES.filter(j=>j.court==="Urgent Court").length, color:"#e07a6e", icon:"shield" },
           { label:"Vacant Positions", v:INIT_JUDGES.filter(j=>j.status==="VACANT").length, color:"var(--gold-l)", icon:"users" },
-          { label:"Hearings Pending", v:(hearings||[]).filter(h=>h.status==="SCHEDULED").length, color:"var(--blue)", icon:"calendar" },
+          { label:"Hearings Pending", v:INIT_HEARINGS.filter(h=>h.status==="SCHEDULED").length, color:"var(--blue)", icon:"calendar" },
         ].map(s => (
           <div key={s.label} className="card" style={{ borderLeft:`3px solid ${s.color}` }}>
             <div className="card-body" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"12px 16px" }}>
@@ -6382,7 +6332,7 @@ const CourtsPage = ({ user, hearings }) => {
             <table className="tbl">
               <thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Date</th><th>Time</th><th>Room</th><th>Judge</th><th>Case</th><th>Status</th></tr></thead>
               <tbody>
-                {(hearings||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).map(h => (
+                {INIT_HEARINGS.sort((a,b)=>a.date.localeCompare(b.date)).map(h => (
                   <tr key={h.id}>
                     <td className="mo tsm tdim">{h.id}</td>
                     <td style={{ fontWeight:500 }}>{h.title}</td>
@@ -7581,11 +7531,9 @@ export default function App() {
   const [cases, setCases] = useState(INIT_CASES);
   const [evidence, setEvidence] = useState(INIT_EVIDENCE);
   const [warrants, setWarrants] = useState(INIT_WARRANTS);
-  const [hearings, setHearings] = useState(INIT_HEARINGS);
   const [notifs, setNotifs] = useState(INIT_NOTIFS);
   const [searchOpen, setSearchOpen] = useState(false);
   const [auditLog, setAuditLog] = useState(typeof INIT_AUDIT_LOG !== "undefined" ? INIT_AUDIT_LOG : []);
-  const [logoutConfirm, setLogoutConfirm] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -7754,13 +7702,13 @@ export default function App() {
 
   const renderPage = () => {
     switch (page) {
-      case "dashboard":    if (!isDOJRole(user?.role)) return <AccessDeniedPage user={user} page="Dashboard" setAuditLog={setAuditLog}/>; return <Dashboard user={user} cases={cases} evidence={evidence} warrants={warrants} hearings={hearings} feed={feed} setPage={setPage}/>;
-      case "cases":        if (!hasPerm(user?.role,"CASE_VIEW"))        return <AccessDeniedPage user={user} page="Cases" setAuditLog={setAuditLog}/>; return <CasesPage user={user} cases={cases} setCases={setCases} evidence={evidence} setEvidence={setEvidence} warrants={warrants} setWarrants={setWarrants} hearings={hearings} setHearings={setHearings} setAuditLog={setAuditLog} onAdd={(c)=>{addToFeed("case","Case created",c.title,c.id,user.username);awardPoints(user.username,"CASE_FILE",c.title,c.id);}} onAddEvidence={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}} onAddWarrant={(w)=>{addToFeed("warrant","Warrant issued",w.type+" — "+w.subject,w.id,user.username);awardPoints(user.username,"WARRANT_ISSUE",w.subject,w.id);}}/>;
+      case "dashboard":    if (!isDOJRole(user?.role)) return <AccessDeniedPage user={user} page="Dashboard" setAuditLog={setAuditLog}/>; return <Dashboard user={user} cases={cases} evidence={evidence} warrants={warrants} feed={feed} setPage={setPage}/>;
+      case "cases":        if (!hasPerm(user?.role,"CASE_VIEW"))        return <AccessDeniedPage user={user} page="Cases" setAuditLog={setAuditLog}/>; return <CasesPage user={user} cases={cases} setCases={setCases} evidence={evidence} setEvidence={setEvidence} warrants={warrants} setWarrants={setWarrants} setAuditLog={setAuditLog} onAdd={(c)=>{addToFeed("case","Case created",c.title,c.id,user.username);awardPoints(user.username,"CASE_FILE",c.title,c.id);}} onAddEvidence={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}} onAddWarrant={(w)=>{addToFeed("warrant","Warrant issued",w.type+" — "+w.subject,w.id,user.username);awardPoints(user.username,"WARRANT_ISSUE",w.subject,w.id);}}/>;
       case "documents":    if (!hasPerm(user?.role,"DOC_VIEW"))         return <AccessDeniedPage user={user} page="Documents" setAuditLog={setAuditLog}/>; return <DocumentsPage user={user} allUsers={allUsers} cases={cases} auditLog={auditLog} setAuditLog={setAuditLog} audit={audit}/>;
       case "evidence":     if (!hasPerm(user?.role,"EVIDENCE_VIEW"))   return <AccessDeniedPage user={user} page="Evidence" setAuditLog={setAuditLog}/>; return <EvidencePage user={user} evidence={evidence} setEvidence={setEvidence} setAuditLog={setAuditLog} onAdd={(e)=>{addToFeed("evidence","Evidence uploaded",e.title,e.id,user.username);awardPoints(user.username,"EVIDENCE_UPLOAD",e.title,e.id);}}/>;
-      case "calendar":     return <CalendarPage user={user} hearings={hearings} setHearings={setHearings}/>;
+      case "calendar":     return <CalendarPage user={user}/>;
       case "jury":         return <JuryPage/>;
-      case "judgesection": return <JudgeSectionPage user={user} allUsers={allUsers} cases={cases} setCases={setCases} auditLog={auditLog} setAuditLog={setAuditLog} hearings={hearings} setHearings={setHearings}/>;
+      case "judgesection": return <JudgeSectionPage user={user} allUsers={allUsers} cases={cases} setCases={setCases} auditLog={auditLog} setAuditLog={setAuditLog}/>;
       case "precedents":   return <PrecedentsPage/>;
       case "criminal":     if (!hasPerm(user?.role,"CRIMINAL_VIEW"))   return <AccessDeniedPage user={user} page="Criminal Records" setAuditLog={setAuditLog}/>; return <CriminalRecordsPage user={user}/>;
       case "citizens":     if (!hasPerm(user?.role,"CITIZEN_VIEW"))    return <AccessDeniedPage user={user} page="Citizen Profiles" setAuditLog={setAuditLog}/>; return <CitizensPage user={user}/>;
@@ -7776,7 +7724,7 @@ export default function App() {
       case "admin":        return <AdminPage user={user} allUsers={allUsers} setAllUsers={setAllUsers} auditLog={auditLog} audit={audit}/>;
       case "profile":      return <ProfilePage user={user} allUsers={allUsers} setAllUsers={setAllUsers}/>;
       case "roster":       return <StaffRosterPage user={user} allUsers={allUsers} setAllUsers={setAllUsers} auditLog={auditLog} setAuditLog={setAuditLog} pointsLog={pointsLog}/>;
-      case "courts":       return <CourtsPage user={user} hearings={hearings}/>;
+      case "courts":       return <CourtsPage user={user}/>;
       case "bausermgmt":   return <BAUserManagementPage user={user} allUsers={allUsers} setAllUsers={setAllUsers} cases={cases} setCases={setCases} audit={audit}/>;
       case "leaderboard":  return <LeaderboardPage user={user} allUsers={allUsers} pointsLog={pointsLog}/>;
       case "points":       return <PointsPage user={user} allUsers={allUsers} setAllUsers={setAllUsers} pointsLog={pointsLog} awardPoints={awardPoints}/>;
@@ -7794,7 +7742,34 @@ export default function App() {
       <PdfModal />
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} setPage={p => { setPage(p); setSearchOpen(false); }}/>
       <div className="app-layout">
-        <Sidebar page={page} setPage={setPage} collapsed={collapsed} setCollapsed={setCollapsed} user={user} onLogout={()=>setLogoutConfirm(true)}/>
+        <Sidebar page={page} setPage={setPage} collapsed={collapsed} setCollapsed={setCollapsed} user={user} onLogout={()=>{
+          const logoutTs = new Date().toISOString();
+          if (user?.authMethod === "discord_server_verified") {
+            setAuditLog(prev => [{
+              id: "AUD-LO-" + Date.now(),
+              ts: logoutTs,
+              actor: user.discordMemberKey || user.username,
+              action: "DISCORD_LOGOUT",
+              ref: user.sessionId || user.id,
+              detail: `Discord session revoked. User: ${user.discordMemberKey || user.username}. Server: ${DOJ_DISCORD_SERVER_ID}. Session terminated. All platform privileges removed.`,
+              type: "auth", severity: "HIGH",
+              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+            }, ...prev.slice(0, 499)]);
+          } else if (user) {
+            setAuditLog(prev => [{
+              id: "AUD-LO-" + Date.now(),
+              ts: logoutTs,
+              actor: user.username,
+              action: "SESSION_LOGOUT",
+              ref: user.id,
+              detail: `Session terminated: ${user.username} (${user.role}). All access revoked.`,
+              type: "auth", severity: "MEDIUM",
+              ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
+            }, ...prev.slice(0, 499)]);
+          }
+          setUser(null);
+          toast("Session terminated — all access revoked. Re-authentication required.", "warn");
+        }}/>
         <div className="main-area">
           <TopBar user={user} dark={dark} setDark={setDark} notifs={notifs} setNotifs={setNotifs} onSearch={() => setSearchOpen(true)}/>
           <div className="page-content">
@@ -7802,61 +7777,6 @@ export default function App() {
           </div>
         </div>
       </div>
-      {logoutConfirm && (
-        <div className="mo-ov" onClick={()=>setLogoutConfirm(false)}>
-          <div className="mo-box" style={{ maxWidth:420 }} onClick={e=>e.stopPropagation()}>
-            <div className="mo-hd">
-              <div>
-                <div style={{ fontWeight:700 }}>Sign Out</div>
-                <div className="tsm tdim">End this session and return to the login screen?</div>
-              </div>
-              <button className="btn btn-xs btn-outline" onClick={()=>setLogoutConfirm(false)}>✕</button>
-            </div>
-            <div className="mo-bd">
-              <div style={{ fontSize:12, color:"var(--mid)", lineHeight:1.6 }}>
-                Signing out will revoke your session token. You will need to re-authenticate to access the portal again.
-              </div>
-            </div>
-            <div className="mo-ft">
-              <button className="btn btn-outline" onClick={()=>setLogoutConfirm(false)}>Cancel</button>
-              <button className="btn btn-red" onClick={()=>{
-                try {
-                  const logoutTs = new Date().toISOString();
-                  if (user?.authMethod === "discord_server_verified") {
-                    setAuditLog(prev => [{
-                      id: "AUD-LO-" + Date.now(),
-                      ts: logoutTs,
-                      actor: user.discordMemberKey || user.username,
-                      action: "DISCORD_LOGOUT",
-                      ref: user.sessionId || user.id,
-                      detail: `Discord session revoked. User: ${user.discordMemberKey || user.username}. Server: ${DOJ_DISCORD_SERVER_ID}. Session terminated.`,
-                      type: "auth", severity: "HIGH",
-                      ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
-                    }, ...prev.slice(0, 499)]);
-                  } else if (user) {
-                    setAuditLog(prev => [{
-                      id: "AUD-LO-" + Date.now(),
-                      ts: logoutTs,
-                      actor: user.username,
-                      action: "SESSION_LOGOUT",
-                      ref: user.id,
-                      detail: `Session terminated: ${user.username} (${user.role}). All access revoked.`,
-                      type: "auth", severity: "MEDIUM",
-                      ip: "10.0.1." + Math.floor(Math.random() * 200 + 10),
-                    }, ...prev.slice(0, 499)]);
-                  }
-                } catch (err) {}
-                setLogoutConfirm(false);
-                setPage("dashboard");
-                setUser(null);
-                toast("Signed out — all access revoked.", "warn");
-              }}>
-                <Ico n="logout" s={13}/> Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       <SpeedInsights />
     </>
     </ErrorBoundary>
